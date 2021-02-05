@@ -47,4 +47,19 @@ def determine_winning_card(cards_d, led_suit, trump):
     :param trump: Str
     :returns: Player
     """
-    raise NotImplementedError
+    eligible_cards_d = {}
+
+    for player, card in cards_d.items():
+        if card.suit == trump:
+            eligible_cards_d[player] = card.value
+
+    if bool(eligible_cards_d):
+        winner = max(eligible_cards_d, key=eligible_cards_d.get)
+
+    else:
+        for player, card in cards_d.items():
+            if card.suit == led_suit:
+                eligible_cards_d[player] = card.value
+        winner = max(eligible_cards_d, key=eligible_cards_d.get)
+
+    return winner
