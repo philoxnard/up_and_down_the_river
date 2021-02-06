@@ -37,13 +37,13 @@ class TestDetermineWinningCard(unittest.TestCase):
         self.assertEqual(winner, p2)
 
     def test_all_trump(self):
-        pass
+        raise NotImplementedError
 
     def test_one_trump(self):
-        pass
+        raise NotImplementedError
 
     def test_only_one_of_leading(self):
-        pass
+        raise NotImplementedError
 
 
 if __name__ == "__main__":
