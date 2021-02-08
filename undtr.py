@@ -36,6 +36,7 @@ class Game:
     """
 
     def __init__(self, players, deck, max_hand_size):
+        self.player_count = None
         self.players = tuple(pl for pl in players)
         self.deck = deck
         self.active_player = None
@@ -46,6 +47,91 @@ class Game:
         self.scores = None
         self.current_tricks = None
         self.led_suit = None
+
+    # Main loop of the game
+
+    def run_game(self):
+        self.initialize_game()
+        # Some kind of loop relating to self.max_hand_size
+        self.execute_round()
+        self.end_game()
+
+    # The following methods operate the highest level logic of the game
+
+    def initialize_game(self):
+        self.create_deck()
+        self.how_many_players()
+        self.get_player_names()
+
+    def execute_round(self):
+        self.deal_cards()
+        self.determine_trump()
+        self.take_bids()
+        self.play_hand()
+        self.round_cleanup()
+
+    def end_game(self):
+        self.display_score()
+        self.play_again()
+
+    # The following methods are used in the initialize_game method
+
+    def create_deck(self):
+        # Method that will create a list called deck which will be filled with card objects
+
+    def how_many_players(self):
+        self.player_count=int(input("How many players?")
+        # Needs a check to make sure the input is an integer
+
+    def get_player_names(self):
+        for player in self.player_count:
+            player_name = input("What is this player's name?")
+            self.players.append(player_name)
+
+    # The following methods are used in the execute_round method
+    # NOTE: These methods don't address who the active player is yet
+
+    def deal_cards(self):
+        for player in self.players:
+            for card in deck[0:self.max_hand_size]:
+                player.hand=deck.pop()
+
+    def determine_trump(self):
+        trump_card=deck(pop)
+        self.trump=trump_card.suit
+
+    def take_bids(self)
+        for player in self.players:
+            player.bid=int(input("What is your bid?"))
+            # Needs a check to make sure the input is an integer
+            # Needs a check to make sure the input is less than or equal to game.max_hand_size
+
+    def play_hand(self):
+        # This is where the bulk of the difficult code will be
+        # Likely will be broken up into lots of different methods
+
+    def round_cleanup(self):
+        # This is where scores will get calculated
+        # Not actually positive what will go in here
+        # Don't need to worry about clearing player hands or making a new deck, that's handled elsewhere
+        # This method might actually not be necessary at all
+
+    # The following methods are used in the end_game method
+
+    def display_score(self):
+        score_dict = {}
+        for player in self.players:
+            print(player.name.title() + "ended the game with + " player.score + "points")
+            score_dict[player.name] = player.score
+
+        winner = max(score_dict, key=score_dict.get) 
+        print(winner.title + "wins the game!")
+        # Needs code to handle condition if two or more players tie for the win
+
+    def play_again():
+        # Code to prompt a rematch
+        # Not really necessary
+        # Also hard to code until we know exactly how the high logic operates      
 
 
 def determine_winning_card(cards_d, led_suit, trump):
