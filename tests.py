@@ -85,7 +85,38 @@ class TestDetermineWinningCard(unittest.TestCase):
         cards_d = {p1: p1_card, p2: p2_card, p3: p3_card}
         winner = undtr.determine_winning_card(cards_d, led_suit, trump)
 
-        self.assertEqual(winner, p1)       
+        self.assertEqual(winner, p1)
+
+
+class TestSortHand(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.club_2 = undtr.Card(2, "CLUBS")
+        cls.club_10 = undtr.Card(10, "CLUBS")
+        cls.diam_2 = undtr.Card(2, "DIAMONDS")
+        cls.diam_10 = undtr.Card(10, "DIAMONDS")
+        cls.spds_2 = undtr.Card(2, "SPADES")
+        cls.hrts_2 = undtr.Card(2, "HEARTS")
+        cls.sort_order = ("CLUBS", "DIAMONDS", "SPADES", "HEARTS")
+
+    def test_sort_four(self):
+        cards = [self.diam_2, self.club_10, self.club_2, self.diam_10]
+        sorted_cards = undtr.sort_cards(cards, self.sort_order)
+        expected_cards = [self.club_2, self.club_10, self.diam_2, self.diam_10]
+        self.assertEqual(sorted_cards, expected_cards)
+
+    def sort_none(self):
+        cards = []
+        sorted_cards = undtr.sort_cards(cards, self.sort_order)
+        expected_cards = []
+        self.assertEqual(sorted_cards, expected_cards)
+
+    def test_sort_all_same_value(self):
+        cards = [self.hrts_2, self.diam_2, self.club_2, self.spds_2]
+        sorted_cards = undtr.sort_cards(cards, self.sort_order)
+        expected_cards = [self.club_2, self.diam_2, self.spds_2, self.hrts_2]
+        self.assertEqual(sorted_cards, expected_cards)
 
 
 if __name__ == "__main__":
