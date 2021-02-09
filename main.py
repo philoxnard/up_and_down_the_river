@@ -32,6 +32,7 @@ if __name__ == "__main__":
                     card = int(input(f"{player.name.title()}, what card do you want to play?"))
                     game.play_card(card, player)
         elif game.state == "game_over":
-            # determine winner + display
+            # determine winner + display (done, exists in game.get_score and game.determine_winning_player)
             # request to play again
+            #TODO: Take input from user if they want to play again
             pass
