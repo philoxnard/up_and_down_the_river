@@ -8,7 +8,7 @@ class Card:
         self.suit = suit
 
     def __repr__(self):
-        return f"Card({self.value}{nickname(self.suit)})"
+        return f"Card({self.value}{nickname(self.suit)}"
 
 
 class Player:
@@ -20,14 +20,118 @@ class Player:
         self.hand = None
         self.bid = None
         self.score = None
-        self.tricks_won = 0
+        self.tricks = 0
 
     def __repr__(self):
         sorted_hand = sort_cards(self.hand)
-        cards_repr = [f"{c}" for c in sorted_hand]
+        cards_repr = [f"{c.value}{nickname(c.suit)}" for c in sorted_hand]
         hand_repr = ', '.join(cards_repr)
-        repr = f"Player( {hand_repr} )"
+        repr = f"Player({hand_repr})"
         return repr
+
+
+class Game:
+    """
+    A class to model a game of Up & Down the River
+    """
+
+    def __init__(self, players, deck, max_hand_size):
+        self.player_count = None
+        self.players = tuple(pl for pl in players)
+        self.deck = deck
+        self.active_player = None
+        self.stage = "bidding"
+        self.trumps = None
+        self.max_hand_size = max_hand_size
+        self.hand_size = None
+        self.scores = None
+        self.current_tricks = None
+        self.led_suit = None
+
+    # Main loop of the game
+
+    def run_game(self):
+        self.initialize_game()
+        # Some kind of loop relating to self.max_hand_size
+        self.execute_round()
+        self.end_game()
+
+    # The following methods operate the highest level logic of the game
+
+    def initialize_game(self):
+        self.create_deck()
+        self.how_many_players()
+        self.get_player_names()
+
+    def execute_round(self):
+        self.deal_cards()
+        self.determine_trump()
+        self.take_bids()
+        self.play_hand()
+        self.round_cleanup()
+
+    def end_game(self):
+        self.display_score()
+        self.play_again()
+
+    # The following methods are used in the initialize_game method
+
+    def create_deck(self):
+        # Method that will create a list called deck which will be filled with card objects
+
+    def how_many_players(self):
+        self.player_count=int(input("How many players?")
+        # Needs a check to make sure the input is an integer
+
+    def get_player_names(self):
+        for player in self.player_count:
+            player_name = input("What is this player's name?")
+            self.players.append(player_name)
+
+    # The following methods are used in the execute_round method
+    # NOTE: These methods don't address who the active player is yet
+
+    def deal_cards(self):
+        for player in self.players:
+            for card in deck[0:self.max_hand_size]:
+                player.hand=deck.pop()
+
+    def determine_trump(self):
+        trump_card=deck(pop)
+        self.trump=trump_card.suit
+
+    def take_bids(self)
+        for player in self.players:
+            player.bid=int(input("What is your bid?"))
+            # Needs a check to make sure the input is an integer
+            # Needs a check to make sure the input is less than or equal to game.max_hand_size
+
+    def play_hand(self):
+        # This is where the bulk of the difficult code will be
+        # Likely will be broken up into lots of different methods
+
+    def round_cleanup(self):
+        # This is where scores will get calculated
+        # Not actually positive what will go in here
+        # Don't need to worry about clearing player hands or making a new deck, that's handled elsewhere
+        # This method might actually not be necessary at all
+
+    # The following methods are used in the end_game method
+
+    def display_score(self):
+        score_dict = {}
+        for player in self.players:
+            print(player.name.title() + "ended the game with + " player.score + "points")
+            score_dict[player.name] = player.score
+
+        winner = max(score_dict, key=score_dict.get) 
+        print(winner.title + "wins the game!")
+        # Needs code to handle condition if two or more players tie for the win
+
+    def play_again():
+        # Code to prompt a rematch
+        # Not really necessary
+        # Also hard to code until we know exactly how the high logic operates      
 
 
 def determine_winning_card(cards_d, led_suit, trump):
@@ -136,3 +240,65 @@ def nickname(suit):
     }
     return mapping.get(suit, suit)
 
+
+
+if __name__ == "__main__":
+
+    # Hard-coded sample game, for initial testing and mockup of Game API
+    NUM_PLAYERS = 2
+    MAX_HAND_SIZE = 2
+
+    players = [Player() for i in range(NUM_PLAYERS)]
+    deck = Deck()  # TODO: Implement Deck class
+    game = Game(players=players, deck=deck, max_hand_size=MAX_HAND_SIZE)
+
+    # One card in each hand -- bidding
+    game.setup_bidding()
+    game.make_bid(1)  # p1's bid
+    game.rotate_player()
+    game.make.bid(0)  # p2's bid
+
+    # 1-Playing tricks -- 1 of 1
+    game.setup_play()
+    game.setup_trick()
+    game.play_card((14, "CLUBS"))  # p1's play
+    game.rotate_player()
+    game.play_card((4, "HEARTS"))  # p2's play
+    game.resolve_trick()
+
+    # Up to 2 cards in each hand
+    game.setup_bidding()
+    game.make_bid(1)  # player *2* now, because dealer rotates
+    game.rotate_player()
+    game.make.bid(1)
+
+    # playing tricks -- 1 of 2
+    game.setup_play()
+    game.setup_trick()
+    game.play_card((12, "DIAMONDS"))
+    game.rotate_player()
+    game.play_card((3, "DIAMONDS"))
+    game.resolve_trick()
+
+    # playing tricks -- 2 of 2
+    game.setup_trick()
+    game.play_card((4, "HEARTS"))
+    game.rotate_player()
+    game.play_card((14, "SPADES"))
+    game.resolve_trick()
+
+    # Back down to 1 card in the hand
+    game.setup_bidding()
+    game.make_bid(1)  # Starts with p1 again
+    game.rotate_player()
+    game.make.bid(0)
+
+    # 1-Playing tricks -- 1 of 1
+    game.setup_play()
+    game.setup_trick()
+    game.play_card((14, "CLUBS"))
+    game.rotate_player()
+    game.play_card((4, "HEARTS"))
+    game.resolve_trick()
+
+    game.resolve_winner()

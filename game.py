@@ -14,11 +14,11 @@ class Game:
         self.state = "initializing"
         self.trumps = None
         self.max_hand_size = None
-        self.hand_size = None
-        self.scores = None
+        self.round = 1
         self.trick = {}
         self.tricks_played = 0
         self.led_suit = None
+        self.score_dict = {}
 
     # Main loop of the game
 
@@ -100,14 +100,46 @@ class Game:
 
         # Once all players' hands are empty
         if self.tricks_played == self.max_hand_size:
-            # TODO: increment hand size and assign scores
+            self.round += 1
+            self.tally_scores()
+            self.check_end_game()
+
+
             raise NotImplementedError
 
+    def tally_scores(self):
+        for player in players:
+            undtr.player.score += undtr.player.tricks
+            if undtr.player.bid == undtr.player.tricks:
+                undtr.player.score += 10
+
+    def check_end_game(self):
+        if self.round == 14:
+            self.state="game_over"
+            self.get_score()
+
+    def get_score(self):
+        if self.state == "game_over":
+            for player in self.players:
+                self.score_dict[player.name] = player.score
+            self.determine_winning_player()
+
+    def determine_winning_player(self):
+        winner = max(self.score_dict, key=self.score_dict.get)
+        print(winner.title + "wins the game!")
+        #TODO: Cover circumstances where there's a tie
 
     # The following methods are used in the execute_round method
     # NOTE: These methods don't address who the active player is yet
 
+    def check_hand_size(self):
+        if self.round <= 7:
+            self.max_hand_size = self.round
+        elif:
+            self.max_hand_size = 14-self.round
+
     def deal_cards(self):
+        self.check_hand_size()
         for player in self.players:
             for card in deck[0:self.max_hand_size]:
                 player.hand=deck.pop()
@@ -133,16 +165,6 @@ class Game:
         # This method might actually not be necessary at all
 
     # The following methods are used in the end_game method
-
-    def display_score(self):
-        score_dict = {}
-        for player in self.players:
-            print(player.name.title() + "ended the game with + " player.score + "points")
-            score_dict[player.name] = player.score
-
-        winner = max(score_dict, key=score_dict.get)
-        print(winner.title + "wins the game!")
-        # Needs code to handle condition if two or more players tie for the win
 
     def play_again():
         # Code to prompt a rematch
