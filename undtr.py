@@ -16,11 +16,12 @@ class Player:
     A class to model a player
     """
 
-    def __init__(self):
-        self.hand = None
+    def __init__(self, name):
+        self.hand = []
         self.bid = None
         self.score = None
         self.tricks = 0
+        self.name = name
 
     def __repr__(self):
         sorted_hand = sort_cards(self.hand)
@@ -78,9 +79,10 @@ class Game:
 
     def create_deck(self):
         # Method that will create a list called deck which will be filled with card objects
+        pass
 
     def how_many_players(self):
-        self.player_count=int(input("How many players?")
+        self.player_count = int(input("How many players?"))
         # Needs a check to make sure the input is an integer
 
     def get_player_names(self):
@@ -100,7 +102,7 @@ class Game:
         trump_card=deck(pop)
         self.trump=trump_card.suit
 
-    def take_bids(self)
+    def take_bids(self):
         for player in self.players:
             player.bid=int(input("What is your bid?"))
             # Needs a check to make sure the input is an integer
@@ -109,19 +111,21 @@ class Game:
     def play_hand(self):
         # This is where the bulk of the difficult code will be
         # Likely will be broken up into lots of different methods
+        pass
 
     def round_cleanup(self):
         # This is where scores will get calculated
         # Not actually positive what will go in here
         # Don't need to worry about clearing player hands or making a new deck, that's handled elsewhere
         # This method might actually not be necessary at all
+        pass
 
     # The following methods are used in the end_game method
 
     def display_score(self):
         score_dict = {}
         for player in self.players:
-            print(player.name.title() + "ended the game with + " player.score + "points")
+            print(player.name.title() + "ended the game with " + str(player.score) + "points")
             score_dict[player.name] = player.score
 
         winner = max(score_dict, key=score_dict.get) 
@@ -131,7 +135,8 @@ class Game:
     def play_again():
         # Code to prompt a rematch
         # Not really necessary
-        # Also hard to code until we know exactly how the high logic operates      
+        # Also hard to code until we know exactly how the high logic operates  
+        pass    
 
 
 def determine_winning_card(cards_d, led_suit, trump):

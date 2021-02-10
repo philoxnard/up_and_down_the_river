@@ -15,7 +15,7 @@ if __name__ == "__main__":
                 game.add_player(player_name)
         elif game.state == "bidding":
             # Deal hands
-            # Show trump card
+            # Show trump card2
             # Collect bid from each player
             for player in game.players:
                 bid = int(input(f"{player.name.title()}, what is your bid?"))
@@ -27,10 +27,14 @@ if __name__ == "__main__":
             # determine the winning card + player
             # clear trick
             # assign points
-            for i in range(game.hand_size):
+            for i in range(game.max_hand_size):
                 for player in game.players:
                     card = int(input(f"{player.name.title()}, what card do you want to play?"))
                     game.play_card(card, player)
+                    # I think the above two lines need to be looked at, seems like
+                    # the code is pointing to an integer rather than a card.
+                    # The integer input from the player is, at this point, meant to 
+                    # point to a card in hand, not just be a floating integer
         elif game.state == "game_over":
             # determine winner + display (done, exists in game.get_score and game.determine_winning_player)
             # request to play again

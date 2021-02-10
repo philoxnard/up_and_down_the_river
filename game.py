@@ -9,7 +9,7 @@ class Game:
     def __init__(self):
         self.player_count = None
         self.players = []
-        self.deck = None
+        self.deck = []
         self.active_player = None
         self.state = "initializing"
         self.trumps = None
@@ -50,10 +50,21 @@ class Game:
 
     def create_deck(self):
         # Method that will create a list called deck which will be filled with card objects
+        # TODO: Make this prettier lol
+        for i in range(13):
+            card = undtr.Card(i, "HEARTS")
+            self.deck.append(card)
+            card = undtr.Card(i, "DIAMONDS")
+            self.deck.append(card)
+            card = undtr.Card(i, "CLUBS")
+            self.deck.append(card)
+            card = undtr.Card(i, "SPADES")
+            self.deck.append(card)
 
     def add_player(self, player_name):
         if self.state == "initializing":
-            self.players.append(player_name)
+            player = undtr.Player(player_name)
+            self.players.append(player)
 
             # self.player_count is set by user, how many players will be initialized.
             # self.players is the list of players that have been initialized.
@@ -85,7 +96,7 @@ class Game:
                 self.state = "playing"
 
     def construct_cards_d(self):
-
+        pass
 
     def play_card(self, card, player):
         player.hand.pop(card)
@@ -135,20 +146,21 @@ class Game:
     def check_hand_size(self):
         if self.round <= 7:
             self.max_hand_size = self.round
-        elif:
+        else:
             self.max_hand_size = 14-self.round
 
     def deal_cards(self):
         self.check_hand_size()
         for player in self.players:
-            for card in deck[0:self.max_hand_size]:
-                player.hand=deck.pop()
+            for card in self.deck[0:self.max_hand_size]:
+                dealt_card=self.deck.pop()
+                player.hand.append(dealt_card)
 
     def determine_trump(self):
-        trump_card=deck(pop)
+        trump_card=self.deck.pop()
         self.trump=trump_card.suit
 
-    def take_bids(self)
+    def take_bids(self):
         for player in self.players:
             player.bid=int(input("What is your bid?"))
             # Needs a check to make sure the input is an integer
@@ -157,12 +169,14 @@ class Game:
     def play_hand(self):
         # This is where the bulk of the difficult code will be
         # Likely will be broken up into lots of different methods
+        pass
 
     def round_cleanup(self):
         # This is where scores will get calculated
         # Not actually positive what will go in here
         # Don't need to worry about clearing player hands or making a new deck, that's handled elsewhere
         # This method might actually not be necessary at all
+        pass
 
     # The following methods are used in the end_game method
 
@@ -170,3 +184,4 @@ class Game:
         # Code to prompt a rematch
         # Not really necessary
         # Also hard to code until we know exactly how the high logic operates
+        pass
