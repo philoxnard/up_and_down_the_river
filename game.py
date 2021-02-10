@@ -1,3 +1,5 @@
+import random
+
 import undtr
 
 
@@ -19,6 +21,25 @@ class Game:
         self.tricks_played = 0
         self.led_suit = None
         self.score_dict = {}
+
+    # Method used for testing to show all the relevant information in the game
+
+    def get_status(self):
+        print(f"The players in this game are:")
+        for player in self.players:
+            print(player.name.title())
+        for player in self.players:
+            print(f"{player.name.title()}'s hand is:")
+            for card in player.hand:
+                print(f"{card.value} of {card.suit}")
+        print(f"We are currently in round number {self.round}")
+        print(f"The max hand size for this round is {self.max_hand_size}")
+        print(f"The trump is currently {self.trump}")
+        for player in self.players:
+            print(f"{player.name.title()}'s score is {player.score}")
+        print()
+        print()
+        print()
 
     # Main loop of the game
 
@@ -51,7 +72,7 @@ class Game:
     def create_deck(self):
         # Method that will create a list called deck which will be filled with card objects
         # TODO: Make this prettier lol
-        for i in range(13):
+        for i in range(1,14):
             card = undtr.Card(i, "HEARTS")
             self.deck.append(card)
             card = undtr.Card(i, "DIAMONDS")
@@ -60,6 +81,7 @@ class Game:
             self.deck.append(card)
             card = undtr.Card(i, "SPADES")
             self.deck.append(card)
+        random.shuffle(self.deck)
 
     def add_player(self, player_name):
         if self.state == "initializing":
@@ -122,6 +144,8 @@ class Game:
                 self.tally_scores()
                 self.check_end_game()
                 if self.state == "bidding":
+                    for player in self.players:
+                        player.tricks = 0
                     self.tricks_played = 0
                     self.create_deck()
                     self.deal_cards()
@@ -160,8 +184,6 @@ class Game:
 
     def deal_cards(self):
         self.check_hand_size()
-        print("the hand size for this round is " + str(self.max_hand_size))
-        print("the current round is round number  " + str(self.round))
         for player in self.players:
             for card in self.deck[0:self.max_hand_size]:
                 dealt_card=self.deck.pop()

@@ -17,6 +17,7 @@ if __name__ == "__main__":
             # Deal hands
             # Show trump card2
             # Collect bid from each player
+            game.get_status()
             for player in game.players:
                 bid = int(input(f"{player.name.title()}, what is your bid?"))
                 game.set_player_bid(bid, player)
@@ -27,6 +28,12 @@ if __name__ == "__main__":
             # determine the winning card + player
             # clear trick
             # assign points
+            # TODO: Figure out why score isn't calculating properly
+            # TODO: Force the player to follow suit if they can
+            # TODO: Write checks to ensure player input is legal
+            # TODO: Make the winner of each trick the leader of the next trick
+            # TODO: Make the leader for each round change
+            # TODO: Sort each player's hand by suit, then by number
             for i in range(game.max_hand_size):
                 for player in game.players:
                     hand_index = int(input(f"{player.name.title()}, what card do you want to play?"))
