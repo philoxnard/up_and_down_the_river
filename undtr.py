@@ -19,7 +19,7 @@ class Player:
     def __init__(self, name):
         self.hand = []
         self.bid = None
-        self.score = None
+        self.score = 0
         self.tricks = 0
         self.name = name
 
@@ -140,6 +140,7 @@ class Game:
 
 
 def determine_winning_card(cards_d, led_suit, trump):
+    #cards_d here refers to game.trick, could be prettier to clean up the language and make it all the same
     """
     Determine which card was the highest from a list of cards:
 

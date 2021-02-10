@@ -69,6 +69,7 @@ class Game:
             # self.player_count is set by user, how many players will be initialized.
             # self.players is the list of players that have been initialized.
             # Once all players are initialized, move on to bidding
+            # TODO: Take the below snippet and make it its own func/method (round start) cause it'll get called elsewhere too
             if len(self.players) == self.player_count:
                 self.state = "bidding"
                 self.create_deck()
@@ -98,31 +99,39 @@ class Game:
     def construct_cards_d(self):
         pass
 
-    def play_card(self, card, player):
-        player.hand.pop(card)
-        self.trick[player] = card
+    def play_card(self, hand_index, player):
+        if self.state == "playing":
+            card = player.hand.pop(hand_index)
+            self.trick[player] = card
+            
+            # If the card is the first one in the suit, it will modify game.led_suit
+            if len(self.trick) == 1:
+                self.led_suit = card.suit
 
-        # If each player has played a card, resolve the trick
-        if len(self.trick) == len(self.players):
-            winner = undtr.determine_winning_card(self.trick, self.led_suit, self.trumps)
-            winner.tricks_won += 1
-            self.trick = {}
-            self.tricks_played += 1
+            # If each player has played a card, resolve the trick
+            if len(self.trick) == len(self.players):
+                winner = undtr.determine_winning_card(self.trick, self.led_suit, self.trumps)
+                winner.tricks += 1
+                self.trick = {}
+                self.tricks_played += 1
 
-        # Once all players' hands are empty
-        if self.tricks_played == self.max_hand_size:
-            self.round += 1
-            self.tally_scores()
-            self.check_end_game()
-
-
-            raise NotImplementedError
+            # Once all players' hands are empty
+            if self.tricks_played == self.max_hand_size:
+                self.round += 1
+                self.state = "bidding"
+                self.tally_scores()
+                self.check_end_game()
+                if self.state == "bidding":
+                    self.tricks_played = 0
+                    self.create_deck()
+                    self.deal_cards()
+                    self.determine_trump()
 
     def tally_scores(self):
-        for player in players:
-            undtr.player.score += undtr.player.tricks
-            if undtr.player.bid == undtr.player.tricks:
-                undtr.player.score += 10
+        for player in self.players:
+            player.score += player.tricks
+            if player.bid == player.tricks:
+                player.score += 10
 
     def check_end_game(self):
         if self.round == 14:
@@ -151,6 +160,8 @@ class Game:
 
     def deal_cards(self):
         self.check_hand_size()
+        print("the hand size for this round is " + str(self.max_hand_size))
+        print("the current round is round number  " + str(self.round))
         for player in self.players:
             for card in self.deck[0:self.max_hand_size]:
                 dealt_card=self.deck.pop()

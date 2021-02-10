@@ -29,8 +29,8 @@ if __name__ == "__main__":
             # assign points
             for i in range(game.max_hand_size):
                 for player in game.players:
-                    card = int(input(f"{player.name.title()}, what card do you want to play?"))
-                    game.play_card(card, player)
+                    hand_index = int(input(f"{player.name.title()}, what card do you want to play?"))
+                    game.play_card(hand_index, player)
                     # I think the above two lines need to be looked at, seems like
                     # the code is pointing to an integer rather than a card.
                     # The integer input from the player is, at this point, meant to 
