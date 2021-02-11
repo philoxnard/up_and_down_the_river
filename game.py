@@ -11,29 +11,26 @@ class Game:
     def __init__(self):
         self.player_count = None
         self.players = []
+        self.ordered_players = []
         self.deck = []
         self.active_player = None
         self.state = "initializing"
-        self.trumps = None
+        self.trump = None
         self.max_hand_size = None
         self.round = 1
         self.trick = {}
         self.tricks_played = 0
         self.led_suit = None
         self.score_dict = {}
+        self.bids_collected = 0
 
     # Method used for testing to show all the relevant information in the game
 
     def get_status(self):
-        print(f"The players in this game are:")
-        for player in self.players:
-            print(player.name.title())
         for player in self.players:
             print(f"{player.name.title()}'s hand is:")
             for card in player.hand:
                 print(f"{card.value} of {card.suit}")
-        print(f"We are currently in round number {self.round}")
-        print(f"The max hand size for this round is {self.max_hand_size}")
         print(f"The trump is currently {self.trump}")
         for player in self.players:
             print(f"{player.name.title()}'s score is {player.score}")
@@ -71,8 +68,8 @@ class Game:
 
     def create_deck(self):
         # Method that will create a list called deck which will be filled with card objects
-        # TODO: Make this prettier lol
-        for i in range(1,14):
+        self.deck = []
+        for i in range(2,15):
             card = undtr.Card(i, "HEARTS")
             self.deck.append(card)
             card = undtr.Card(i, "DIAMONDS")
@@ -91,31 +88,20 @@ class Game:
             # self.player_count is set by user, how many players will be initialized.
             # self.players is the list of players that have been initialized.
             # Once all players are initialized, move on to bidding
-            # TODO: Take the below snippet and make it its own func/method (round start) cause it'll get called elsewhere too
             if len(self.players) == self.player_count:
+                self.ordered_players = self.players
                 self.state = "bidding"
                 self.create_deck()
                 self.deal_cards()
                 self.determine_trump()
 
-    def get_player_bids(self):
-        d = {}
-        for player in self.players:
-            d[player] = player.bid
-        return d
-
     def set_player_bid(self, bid, player):
         if self.state == "bidding":
             player.bid = bid
-
-            # Check wither all bids have been collected and move on if necessary
-            player_bids = self.get_player_bids()
-            num_bids = 0
-            for bid in player_bids.values():
-                if bid is not None:
-                    num_bids += 1
-
-            if num_bids == len(self.players):
+            self.bids_collected += 1
+            
+            # If all players have bid, game state progresses to playing state
+            if self.bids_collected == len(self.players):
                 self.state = "playing"
 
     def construct_cards_d(self):
@@ -132,12 +118,20 @@ class Game:
 
             # If each player has played a card, resolve the trick
             if len(self.trick) == len(self.players):
-                winner = undtr.determine_winning_card(self.trick, self.led_suit, self.trumps)
+                for key, value in self.trick.items():
+                    print(f"{key.name.title()} played the {value.value} of {value.suit}")
+                winner = undtr.determine_winning_card(self.trick, self.led_suit, self.trump)
                 winner.tricks += 1
+                print(f"{winner.name.title()} won the trick and now has {winner.tricks} trick(s)")
+                winner_index = self.players.index(winner)
                 self.trick = {}
                 self.tricks_played += 1
 
+                # Pass priority to whoever won the trick
+                self.ordered_players = self.players[winner_index:] + self.players[:winner_index]
+
             # Once all players' hands are empty
+            # This is all a lot of clean up that could be organized better
             if self.tricks_played == self.max_hand_size:
                 self.round += 1
                 self.state = "bidding"
@@ -150,12 +144,20 @@ class Game:
                     self.create_deck()
                     self.deal_cards()
                     self.determine_trump()
+                    self.bids_collected = 0
+                    # This makes sure the following round starts with the next player in the circle
+                    next_dealer = self.players[(self.round - 1) % len(self.players)]
+                    next_dealer_index = self.players.index(next_dealer)
+                    self.ordered_players = self.players[next_dealer_index:] + self.players[:next_dealer_index]
 
     def tally_scores(self):
         for player in self.players:
             player.score += player.tricks
+            print(f"{player.name.title()} had a bid of {player.bid}")
+            print(f"{player.name.title()} won {player.tricks}")
             if player.bid == player.tricks:
                 player.score += 10
+                print(f"{player.name.title()} made their bid!")
 
     def check_end_game(self):
         if self.round == 14:
@@ -171,10 +173,8 @@ class Game:
     def determine_winning_player(self):
         winner = max(self.score_dict, key=self.score_dict.get)
         print(winner.title + "wins the game!")
-        #TODO: Cover circumstances where there's a tie
 
     # The following methods are used in the execute_round method
-    # NOTE: These methods don't address who the active player is yet
 
     def check_hand_size(self):
         if self.round <= 7:

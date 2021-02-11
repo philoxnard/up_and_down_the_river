@@ -18,7 +18,7 @@ if __name__ == "__main__":
             # Show trump card2
             # Collect bid from each player
             game.get_status()
-            for player in game.players:
+            for player in game.ordered_players:
                 bid = int(input(f"{player.name.title()}, what is your bid?"))
                 game.set_player_bid(bid, player)
         elif game.state == "playing":
@@ -28,14 +28,11 @@ if __name__ == "__main__":
             # determine the winning card + player
             # clear trick
             # assign points
-            # TODO: Figure out why score isn't calculating properly
-            # TODO: Force the player to follow suit if they can
-            # TODO: Write checks to ensure player input is legal
-            # TODO: Make the winner of each trick the leader of the next trick
-            # TODO: Make the leader for each round change
-            # TODO: Sort each player's hand by suit, then by number
+            # TODO: Force the player to follow suit if they can (not priority, basically part of the next todo item)
+            # TODO: Write checks to ensure player input is legal (not priority)
+            # TODO: Sort each player's hand by suit, then by number (not priority)
             for i in range(game.max_hand_size):
-                for player in game.players:
+                for player in game.ordered_players:
                     hand_index = int(input(f"{player.name.title()}, what card do you want to play?"))
                     game.play_card(hand_index, player)
                     # I think the above two lines need to be looked at, seems like
@@ -45,5 +42,6 @@ if __name__ == "__main__":
         elif game.state == "game_over":
             # determine winner + display (done, exists in game.get_score and game.determine_winning_player)
             # request to play again
-            #TODO: Take input from user if they want to play again
+            #TODO: Take input from user if they want to play again (not priority)
+            #TODO: Cover cases where two scores tie for a win (not priority)
             pass
