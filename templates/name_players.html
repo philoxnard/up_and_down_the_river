@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+    <body>
+            <form action="{{url_for('show_players')}}" method="post">
+                {% for i in range(player_count) %}
+                    <input type="text" name="{{ i }}" placeholder="name of player {{ i+1 }}">
+                    <br>
+                {% endfor %}
+                <button>Submit</button>
+            </form>
+    </body>
+</html>
