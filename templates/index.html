@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html>
-    <body>
-        <h1>how many players in the game?</h1>
-        <form action="{{url_for('name_players')}}" method="post">
-            <input type="text" name="player_count" placeholder="number of players">
-            <button>Submit</button>
-        </form>
-    </body>
-</html>
+  <html lang="en">
+  <head>
+    <title>Flask_Chat_App</title>
+  </head>
+  <body>
+    <form action="" method="POST">
+      <input type="text" class="name" placeholder="User Name"/>
+      <input type="submit" value="Submit"/>
+    </form>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.1.1/socket.io.min.js"></script>
+    <script type="text/javascript" src="static/javascript.js"></script>
+
+  </body>
+  </html>
