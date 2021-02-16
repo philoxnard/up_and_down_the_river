@@ -16,7 +16,8 @@ class Player:
     A class to model a player
     """
 
-    def __init__(self, name):
+    def __init__(self, name, sid):
+        self.sid = sid
         self.hand = []
         self.bid = None
         self.score = 0

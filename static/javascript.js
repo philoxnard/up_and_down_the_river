@@ -4,7 +4,8 @@ socket.on( 'connect', function() {
   var form = $('#getPlayer').on( 'submit', function( e ) {
     e.preventDefault()
     let user_name = $( 'input.name' ).val()
-    socket.emit('new user', user_name)
+    console.log(socket.id)
+    socket.emit('new user', user_name, socket.id)
     $('#content').html('<form id="start"><input type="submit" value="ready"/></form>')
   
   var start = $('#start').on('submit', function(){
@@ -18,7 +19,8 @@ socket.on( 'player_added', function(players) {
   console.log(players)
 })
 
-socket.on( 'success', function() {
+// TODO: Emit to each player's individual room using that player.sid
+socket.on( 'success', function(name) {
   console.log("console success")
-  $('#content').html("game has started, game.state set to bidding")
+  $('#content').html(name)
 })

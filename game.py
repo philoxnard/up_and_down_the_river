@@ -80,9 +80,9 @@ class Game:
             self.deck.append(card)
         random.shuffle(self.deck)
 
-    def add_player(self, player_name):
+    def add_player(self, player_name, sid):
         if self.state == "initializing":
-            player = undtr.Player(player_name)
+            player = undtr.Player(player_name, sid)
             self.players.append(player)
 
             # self.player_count is set by user, how many players will be initialized.
