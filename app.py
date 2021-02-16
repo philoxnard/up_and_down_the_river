@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO
 
 from game import Game
@@ -13,12 +13,19 @@ socketio = SocketIO(app)
 def sessions():
     return render_template('index.html')
 
-@socketio.on('my event')
-def handle_my_custom_event(json, methods=['GET', "POST"]):
+@socketio.on('new user')
+def handle_new_user_event(json, methods=['GET', "POST"]):
     game.add_player(str(json))
     print(f"there are {str(len(game.players))} players in the game")
     for player in game.players:
         print(player.name + " is in the game")
+    socketio.emit("player_added", [p.name for p in game.players])
+
+@socketio.on("game start")
+def handle_game_start_event(methods=["GET", "POST"]):
+    print("start the game")
+    game.state = "bidding"
+    socketio.emit("success")
 
 
 if __name__ == '__main__':
