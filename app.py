@@ -24,9 +24,12 @@ def handle_new_user_event(name, sid, methods=['GET', "POST"]):
 @socketio.on("game start")
 def handle_game_start_event(methods=["GET", "POST"]):
     print("start the game")
-    game.state = "bidding"
+    game.start_round()
     for player in game.players:
-        socketio.emit("success", player.name, room=player.sid)
+        hand_dict = {}
+        for card in player.hand:
+            hand_dict[card.value]=card.suit
+            socketio.emit("deal hand", hand_dict, room=player.sid)
 
 
 if __name__ == '__main__':

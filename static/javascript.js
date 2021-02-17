@@ -19,8 +19,10 @@ socket.on( 'player_added', function(players) {
   console.log(players)
 })
 
-// TODO: Emit to each player's individual room using that player.sid
-socket.on( 'success', function(name) {
-  console.log("console success")
-  $('#content').html(name)
+
+socket.on("deal hand", function(hand) {
+  console.log(hand)
+  let handValues = Object.keys(hand)
+  let handSuits = Object.values(hand)
+  $('#content').html(handValues+"<br>"+handSuits)
 })
