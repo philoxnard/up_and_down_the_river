@@ -26,10 +26,12 @@ def handle_game_start_event(methods=["GET", "POST"]):
     print("start the game")
     game.start_round()
     for player in game.players:
-        hand_dict = {}
+        hand_dict = {
+            game.trump_value: game.trump
+        }
         for card in player.hand:
             hand_dict[card.value]=card.suit
-            socketio.emit("deal hand", hand_dict, room=player.sid)
+        socketio.emit("deal hand", hand_dict, room=player.sid)
 
 
 if __name__ == '__main__':

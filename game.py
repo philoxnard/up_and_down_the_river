@@ -16,6 +16,7 @@ class Game:
         self.active_player = None
         self.state = "initializing"
         self.trump = None
+        self.trump_value = None
         self.max_hand_size = None
         self.round = 1
         self.trick = {}
@@ -199,6 +200,7 @@ class Game:
     def determine_trump(self):
         trump_card=self.deck.pop()
         self.trump=trump_card.suit
+        self.trump_value=trump_card.value
 
     def take_bids(self):
         for player in self.players:
