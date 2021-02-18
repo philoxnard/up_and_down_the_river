@@ -70,13 +70,13 @@ class Game:
         # Method that will create a list called deck which will be filled with card objects
         self.deck = []
         for i in range(2,15):
-            card = undtr.Card(i, "HEARTS")
+            card = undtr.Card(i, "&heartsuit;")
             self.deck.append(card)
-            card = undtr.Card(i, "DIAMONDS")
+            card = undtr.Card(i, "&diamondsuit;")
             self.deck.append(card)
-            card = undtr.Card(i, "CLUBS")
+            card = undtr.Card(i, "&clubsuit;")
             self.deck.append(card)
-            card = undtr.Card(i, "SPADES")
+            card = undtr.Card(i, "&spadesuit;")
             self.deck.append(card)
         random.shuffle(self.deck)
 
@@ -94,6 +94,13 @@ class Game:
                 self.create_deck()
                 self.deal_cards()
                 self.determine_trump()
+
+    def start_round(self):
+        self.ordered_players = self.players
+        self.state = "bidding"
+        self.create_deck()
+        self.deal_cards()
+        self.determine_trump()
 
     def set_player_bid(self, bid, player):
         if self.state == "bidding":

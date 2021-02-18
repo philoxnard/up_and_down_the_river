@@ -22,7 +22,19 @@ socket.on( 'player_added', function(players) {
 
 socket.on("deal hand", function(hand) {
   console.log(hand)
-  let handValues = Object.keys(hand)
-  let handSuits = Object.values(hand)
-  $('#content').html(handValues+"<br>"+handSuits)
+  for (var card in hand) {
+    let value = card
+    let suit = hand[card]
+    if (suit == "&clubsuit;" || suit == "&spadesuit;"){
+      var color = "black"
+    }
+    else{
+      var color = "red"
+    }
+    $('#content').html('<div class="'+color+' card">\
+                        <div class="top">'+value+' '+suit+'</div>\
+                        <h1>'+suit+'</h1>\
+                        <div class="bottom">'+value+' '+suit+'</div>\
+                        </div>')
+  }
 })

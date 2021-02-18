@@ -1,0 +1,28 @@
+.card {
+    border-style: solid;
+    border-color: black;
+    width: 150px;
+    height: 200px;
+    position: relative;
+    display: inline-block;
+}
+.red{
+    color: red;
+}
+.black {
+    color: black;
+}
+.top{
+    text-align: left;
+    padding: 5px;
+}
+.bottom{
+    text-align: right;
+    margin-top: 35%;
+    padding: 5px;
+}
+h1{
+    margin: auto;
+    text-align: center;
+    margin-top: 35%;
+}
