@@ -19,16 +19,9 @@ socket.on( 'player_added', function(players) {
   console.log(players)
 })
 
-
-// TODO: Clean up this monster function, its huge. 
-// TODO: Still need to figure how how input is going to work.
-
-socket.on("deal hand", function(hand) {
-  console.log(hand)
+function getTrump(hand){
   let trumpValue = Object.keys(hand)[0]
   let trumpSuit = hand[trumpValue]
-  delete hand[trumpValue]
-  let handArray = ""
   if (trumpSuit == "&clubsuit;" || trumpSuit == "&spadesuit;"){
     trumpColor = "black"
   }
@@ -40,6 +33,12 @@ socket.on("deal hand", function(hand) {
               <h1>'+trumpSuit+'</h1>\
               <div class="bottom">'+trumpValue+' '+trumpSuit+'</div>\
               </div>')
+  return trumpCard
+}
+
+function getHandArray(hand){
+  let handArray = ""
+  console.log(hand)
   for (var card in hand) {
     let value = card
     let suit = hand[card]
@@ -55,11 +54,31 @@ socket.on("deal hand", function(hand) {
                 <h1>'+suit+'</h1>\
                 <div class="bottom">'+value+' '+suit+'</div>\
                 </div>')
-  let bidField = "<form>\
-                  <input type='text'\
-                  placeholder='Input your bid'>\
-                  <input type='submit'\
-                  value='Submit'>"
-  $('#content').html(handArray+'<br>'+bidField+'<br>'+trumpCard)
   }
+  return handArray
+}
+
+function getBidField(){
+  let bidField = "<form action='' id='getBid' method='POST'>\
+                  <input type='text' placeholder='Input your bid' class='bid'>\
+                  <input type='submit' value='Submit'>"
+  return bidField
+}
+
+function showHand(hand){
+  console.log(hand)
+  let trumpCard = getTrump(hand)
+  delete hand[Object.keys(hand)[0]];
+  let handArray = getHandArray(hand)
+  let bidField = getBidField()
+  let showHand ='hand:'+handArray+'<br>'+bidField+'<br>'+'trump card:'+trumpCard
+  return showHand
+}
+
+// TODO: Still need to figure how how input is going to work.
+// TODO: Eventually gonna have to refactor this document cause its getting big
+
+socket.on("deal hand", function(hand) {
+  let shownHand = showHand(hand)
+  $('#content').html(shownHand)
 })

@@ -33,6 +33,10 @@ def handle_game_start_event(methods=["GET", "POST"]):
             hand_dict[card.value]=card.suit
         socketio.emit("deal hand", hand_dict, room=player.sid)
 
+@socketio.on("bid")
+def handle_bid(bid, methods=["GET", "POST"]):
+    print("found")
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)
