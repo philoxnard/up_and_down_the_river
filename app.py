@@ -21,9 +21,9 @@ def handle_new_user_event(name, sid, methods=['GET', "POST"]):
         print(player.name + " is in the game")
     socketio.emit("player_added", [p.name for p in game.players])
 
-@socketio.on("game start")
+@socketio.on("round start")
 def handle_game_start_event(methods=["GET", "POST"]):
-    print("start the game")
+    print("start the round")
     game.start_round()
     for player in game.ordered_players:
         hand_dict = {
@@ -32,18 +32,19 @@ def handle_game_start_event(methods=["GET", "POST"]):
         for card in player.hand:
             hand_dict[card.value]=card.suit
         socketio.emit("deal hand", hand_dict, room=player.sid)
-        # This function has to somehow pass around the bid
+    for i, player in enumerate(game.ordered_players):
+        if i == game.bids_collected:
+            socketio.emit("get bid", room=player.sid)
 
-@socketio.on("receive bid")
-def handle_bid(bid, sid, methods=["GET", "POST"]):
-    game.set_player_bid(bid, sid)
-    if len(game.players)==game.bids_collected:
-        for player in game.players:
-            print(f"{player.name.title()} bid {player.bid}")
-            # set game state to playing
-            # create an emit to begin playing cards
-            # remove the input field after bid is placed
-            # only show bid if its the current player's turn
+# @socketio.on("receive bid")
+# def handle_bid(bid, sid, methods=["GET", "POST"]):
+#     game.set_player_bid(bid, sid)
+#     if len(game.players)==game.bids_collected:
+#         for player in game.players:
+#             print(f"{player.name.title()} bid {player.bid}")
+########
+######## Keeping this commented out until the functionality for passing bid around 
+######## Is working as intended
 
 
 if __name__ == '__main__':

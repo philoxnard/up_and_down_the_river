@@ -13,7 +13,7 @@ $('#content').on("submit", "#getPlayer", function(e) {
 $("#content").on("submit", "#start", function(e){
   e.preventDefault()
   $('#content').html("placeholder")
-  socket.emit("game start")
+  socket.emit("round start")
 })
 
 $("#content").on("submit", "#getBid", function(e){
@@ -80,8 +80,7 @@ function showHand(hand){
   let trumpCard = getTrump(hand)
   delete hand["trump"]
   let handArray = getHandArray(hand)
-  let bidField = getBidField()
-  let showHand ='hand:'+handArray+'<br><br>'+'trump card:'+trumpCard
+  let showHand ='hand:'+handArray+'<br><br>'+'trump card:'+trumpCard+'<br><br>'
   return showHand
 }
 
@@ -90,4 +89,10 @@ function showHand(hand){
 socket.on("deal hand", function(hand) {
   let shownHand = showHand(hand)
   $('#content').html(shownHand)
+  socket.emit("pass bid")
+})
+
+socket.on("get bid", function(){
+  let bidField = getBidField()
+  $('#content').append(bidField)
 })
