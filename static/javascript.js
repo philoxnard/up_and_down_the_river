@@ -1,21 +1,29 @@
 var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-socket.on( 'connect', function() {
-  var form = $('#getPlayer').on( 'submit', function( e ) {
-    e.preventDefault()
-    let user_name = $( 'input.name' ).val()
-    console.log(socket.id)
-    socket.emit('new user', user_name, socket.id)
-    $('#content').html('<form id="start"><input type="submit" value="ready"/></form>')
-  
-  var start = $('#start').on('submit', function(){
-    $('#content').html("placeholder")
-    socket.emit("game start")
-    })
-  })
-}) 
+$('#content').on("submit", "#getPlayer", function(e) {
+  e.preventDefault()
+  let user_name = $( 'input.name' ).val()
+  console.log(socket.id)
+  socket.emit('new user', user_name, socket.id)
+  $('#content').html('<form action="" id="start">\
+                        <input type="submit" value="Start the game">\
+                      </form>')  
+})
 
-socket.on( 'player_added', function(players) {
+$("#content").on("submit", "#start", function(e){
+  e.preventDefault()
+  $('#content').html("placeholder")
+  socket.emit("game start")
+})
+
+$("#content").on("submit", "#getBid", function(e){
+  e.preventDefault()
+  let bid = $('input.bid').val()
+  console.log(bid)
+  socket.emit("receive bid", bid, socket.id)
+})
+
+socket.on('player_added', function(players) {
   console.log(players)
 })
 
@@ -60,8 +68,9 @@ function getHandArray(hand){
 
 function getBidField(){
   let bidField = "<form action='' id='getBid' method='POST'>\
-                  <input type='text' placeholder='Input your bid' class='bid'>\
-                  <input type='submit' value='Submit'>"
+                    <input type='text' placeholder='Input your bid' class='bid'>\
+                    <input type='submit' value='Submit'>\
+                  </form>"
   return bidField
 }
 
@@ -77,6 +86,7 @@ function showHand(hand){
 
 // TODO: Still need to figure how how input is going to work.
 // TODO: Eventually gonna have to refactor this document cause its getting big
+// TODO: BUG FIX: Sometimes the cards don't display in the right place, no idea why
 
 socket.on("deal hand", function(hand) {
   let shownHand = showHand(hand)

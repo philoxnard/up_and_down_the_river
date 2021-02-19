@@ -103,10 +103,12 @@ class Game:
         self.deal_cards()
         self.determine_trump()
 
-    def set_player_bid(self, bid, player):
+    def set_player_bid(self, bid, sid):
         if self.state == "bidding":
-            player.bid = bid
-            self.bids_collected += 1
+            for player in self.players:
+                if sid == player.sid:
+                    player.bid = bid
+                    self.bids_collected += 1
             
             # If all players have bid, game state progresses to playing state
             if self.bids_collected == len(self.players):

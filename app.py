@@ -33,9 +33,16 @@ def handle_game_start_event(methods=["GET", "POST"]):
             hand_dict[card.value]=card.suit
         socketio.emit("deal hand", hand_dict, room=player.sid)
 
-@socketio.on("bid")
-def handle_bid(bid, methods=["GET", "POST"]):
-    print("found")
+@socketio.on("receive bid")
+def handle_bid(bid, sid, methods=["GET", "POST"]):
+    game.set_player_bid(bid, sid)
+    if len(game.players)==game.bids_collected:
+        for player in game.players:
+            print(f"{player.name.title()} bid {player.bid}")
+            # set game state to playing
+            # create an emit to begin playing cards
+            # remove the input field after bid is placed
+            # only show bid if its the current player's turn
 
 
 if __name__ == '__main__':
