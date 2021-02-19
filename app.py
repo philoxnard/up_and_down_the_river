@@ -25,13 +25,14 @@ def handle_new_user_event(name, sid, methods=['GET', "POST"]):
 def handle_game_start_event(methods=["GET", "POST"]):
     print("start the game")
     game.start_round()
-    for player in game.players:
+    for player in game.ordered_players:
         hand_dict = {
-            game.trump_value: game.trump
+            "trump": [game.trump_value, game.trump]
         }
         for card in player.hand:
             hand_dict[card.value]=card.suit
         socketio.emit("deal hand", hand_dict, room=player.sid)
+        # This function has to somehow pass around the bid
 
 @socketio.on("receive bid")
 def handle_bid(bid, sid, methods=["GET", "POST"]):

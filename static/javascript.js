@@ -28,8 +28,9 @@ socket.on('player_added', function(players) {
 })
 
 function getTrump(hand){
-  let trumpValue = Object.keys(hand)[0]
-  let trumpSuit = hand[trumpValue]
+  let trump = hand["trump"]
+  let trumpValue = trump[0]
+  let trumpSuit = trump[1]
   if (trumpSuit == "&clubsuit;" || trumpSuit == "&spadesuit;"){
     trumpColor = "black"
   }
@@ -77,16 +78,14 @@ function getBidField(){
 function showHand(hand){
   console.log(hand)
   let trumpCard = getTrump(hand)
-  delete hand[Object.keys(hand)[0]];
+  delete hand["trump"]
   let handArray = getHandArray(hand)
   let bidField = getBidField()
-  let showHand ='hand:'+handArray+'<br>'+bidField+'<br>'+'trump card:'+trumpCard
+  let showHand ='hand:'+handArray+'<br><br>'+'trump card:'+trumpCard
   return showHand
 }
 
-// TODO: Still need to figure how how input is going to work.
 // TODO: Eventually gonna have to refactor this document cause its getting big
-// TODO: BUG FIX: Sometimes the cards don't display in the right place, no idea why
 
 socket.on("deal hand", function(hand) {
   let shownHand = showHand(hand)
