@@ -1,3 +1,8 @@
+# TODO: Clean this document up. Most of the stuff here is redundant and unused.
+# TODO: Look through the other files and see where undtr is called. Most likely,
+# TODO: everything outside of the Card class, Player class, and the function
+# TODO: for determining winning card can be removed
+
 class Card:
     """
     A class that represents a card

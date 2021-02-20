@@ -35,9 +35,6 @@ class Game:
         print(f"The trump is currently {self.trump}")
         for player in self.players:
             print(f"{player.name.title()}'s score is {player.score}")
-        print()
-        print()
-        print()
 
     # Main loop of the game
 
