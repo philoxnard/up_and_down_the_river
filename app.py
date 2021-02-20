@@ -38,7 +38,7 @@ def handle_start_bidding_event(methods=["GET", "POST"]):
         game.active_player_index = 0
         active_player = game.ordered_players[game.active_player_index]
         game.state = "playing"
-        socketio.emit("begin play", room=active_player.sid)
+        socketio.emit("your turn", room=active_player.sid)
     else:
         active_player = game.ordered_players[game.active_player_index]
         if not active_player.bid_active:
@@ -52,6 +52,24 @@ def handle_bid(bid, sid, methods=["GET", "POST"]):
     socketio.emit("get next bid")
     for player in game.ordered_players:
         print(f"{player.name}'s bid is {player.bid}")
+
+@socketio.on("play card")
+def handle_card_click_event(index, sid, methods=["GET", "POST"]):
+    active_player = game.ordered_players[game.active_player_index]
+    if active_player.sid == sid and game.state=="playing":
+        print("active player is playing card")
+        game.play_card(int(index), active_player)
+        game.active_player_index += 1
+        if game.active_player_index == len(game.ordered_players):
+            game.active_player_index = 0
+            # Put in some code here to re deal hands I guess?
+        else:
+            socketio.emit("update hand", active_player.hand, room=active_player.sid)
+            next_player = game.ordered_players[game.active_player_index]
+            socketio.emit("your turn", room=next_player.sid)
+    else:
+        print("its either not your turn, or its bidding time")
+
 
 
 

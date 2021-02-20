@@ -24,6 +24,14 @@ $("#content").on("submit", "#getBid", function(e){
   socket.emit("receive bid", bid, socket.id)
 })
 
+$("#content").on("click", ".hand", function(){
+  let index = $(this).attr("id");
+  socket.emit("play card", index, socket.id)
+  //create play card event
+  //have it take index as well as socket.id
+  //check to see if socket.id is the same as active_player.sid
+})
+
 socket.on("deal hand", function(hand) {
   let shownHand = showHand(hand)
   $('#content').html(shownHand)
@@ -39,8 +47,18 @@ socket.on("get next bid", function(){
   socket.emit("request bid")
 })
 
-// This is the next function to work on
-socket.on("begin play", function(){
+socket.on("update hand", function(hand){
+  let handArray = getHandArray(hand)
+  let shownHand ='hand:'+handArray
+  $("#content").html(shownHand)
+  // TODO: Alter both this code here and the general code on how a hand is displayed
+  // TODO: to make it so that updating the hand only replaces a hand div that's inside
+  // TODO: the content div. There should be a hand div, a trump div, and maybe
+  // TODO: a bid div, as well as some other informational divs to add in there later
+  // TODO: like name, score, whose turn it is, what everyone else has bid so far.
+})
+
+socket.on("your turn", function(){
   $("#content").append("Its your turn to play a card")
 })
 
@@ -76,7 +94,7 @@ function getHandArray(hand){
     else{
       color = "red"
     }
-    handArray+=('<div class="'+color+' card id='+index+'">\
+    handArray+=('<div class="'+color+' hand card" id="'+index+'">\
                 <div class="top">'+value+' '+suit+'</div>\
                 <h1>'+suit+'</h1>\
                 <div class="bottom">'+value+' '+suit+'</div>\
