@@ -11,9 +11,9 @@ class Game:
     def __init__(self):
         self.player_count = None
         self.players = []
-        self.ordered_players = []
+        self.ordered_players = None
         self.deck = []
-        self.active_player = None
+        self.active_player_index = 0
         self.state = "initializing"
         self.trump = None
         self.trump_value = None
@@ -97,7 +97,8 @@ class Game:
                 self.determine_trump()
 
     def start_round(self):
-        self.ordered_players = self.players
+        if not self.ordered_players:
+            self.ordered_players = self.players
         self.state = "bidding"
         self.create_deck()
         self.deal_cards()
@@ -195,8 +196,9 @@ class Game:
     def deal_cards(self):
         self.check_hand_size()
         for player in self.players:
-            for card in self.deck[0:self.max_hand_size]:
+            for i, card in enumerate(self.deck[0:self.max_hand_size]):
                 dealt_card=self.deck.pop()
+                dealt_card.index = i
                 player.hand.append(dealt_card)
 
     def determine_trump(self):

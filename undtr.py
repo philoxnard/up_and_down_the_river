@@ -6,6 +6,7 @@ class Card:
     def __init__(self, value, suit):
         self.value = value
         self.suit = suit
+        self.index = None
 
     def __repr__(self):
         return f"Card({self.value}{nickname(self.suit)}"
@@ -17,6 +18,7 @@ class Player:
     """
 
     def __init__(self, name, sid):
+        self.bid_active = False
         self.sid = sid
         self.hand = []
         self.bid = None

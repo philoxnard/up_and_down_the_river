@@ -19,12 +19,29 @@ $("#content").on("submit", "#start", function(e){
 $("#content").on("submit", "#getBid", function(e){
   e.preventDefault()
   let bid = $('input.bid').val()
+  $("#getBid").remove()
   console.log(bid)
   socket.emit("receive bid", bid, socket.id)
 })
 
-socket.on('player_added', function(players) {
-  console.log(players)
+socket.on("deal hand", function(hand) {
+  let shownHand = showHand(hand)
+  $('#content').html(shownHand)
+  socket.emit("request bid")
+})
+
+socket.on("make bid field", function(){
+  let bidField = getBidField()
+  $('#content').append(bidField)
+})
+
+socket.on("get next bid", function(){
+  socket.emit("request bid")
+})
+
+// This is the next function to work on
+socket.on("begin play", function(){
+  $("#content").append("Its your turn to play a card")
 })
 
 function getTrump(hand){
@@ -49,6 +66,7 @@ function getHandArray(hand){
   let handArray = ""
   console.log(hand)
   for (var card in hand) {
+    let index = 0
     let value = card
     let suit = hand[card]
     let color
@@ -58,11 +76,12 @@ function getHandArray(hand){
     else{
       color = "red"
     }
-    handArray+=('<div class="'+color+' card">\
+    handArray+=('<div class="'+color+' card id='+index+'">\
                 <div class="top">'+value+' '+suit+'</div>\
                 <h1>'+suit+'</h1>\
                 <div class="bottom">'+value+' '+suit+'</div>\
                 </div>')
+    index += 1
   }
   return handArray
 }
@@ -83,16 +102,3 @@ function showHand(hand){
   let showHand ='hand:'+handArray+'<br><br>'+'trump card:'+trumpCard+'<br><br>'
   return showHand
 }
-
-// TODO: Eventually gonna have to refactor this document cause its getting big
-
-socket.on("deal hand", function(hand) {
-  let shownHand = showHand(hand)
-  $('#content').html(shownHand)
-  socket.emit("pass bid")
-})
-
-socket.on("get bid", function(){
-  let bidField = getBidField()
-  $('#content').append(bidField)
-})
