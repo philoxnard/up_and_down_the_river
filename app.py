@@ -101,34 +101,28 @@ def handle_card_click_event(index, sid, methods=["GET", "POST"]):
     """
     active_player = game.ordered_players[game.active_player_index]
     if active_player.sid == sid and game.state=="playing":
-        print("active player is playing card")
         game.play_card(int(index), active_player)
+        for player, card in game.trick.items():
+            card_list = [card.value, card.suit]
+            game.trick_obj[player.name]=card_list
+        socketio.emit("update hand", active_player.hand, room=active_player.sid)
+        socketio.emit("show trick", game.trick_obj)
+        print(f"{game.trick_obj}")
         game.active_player_index += 1
-        if game.active_player_index == len(game.ordered_players):
-            game.active_player_index = 0
-            # TODO: Create an "end round" function
-            # TODO: Somehow make it happen after all the following code
-            # TODO: Let all the info sit on screen, put in a button to let the
-            # TODO: players progress to the next round when they want to
-            # TODO: Make another socketio.emit to show each player's bid in a table
-            # TODO: probably into a new div called bidTable or something
-            socketio.emit("end round")
+        if game.active_player_index == len(game.players):
+            socketio.emit("end trick", game.winner_message)
         else:
-            socketio.emit("update hand", active_player.hand, room=active_player.sid)
             next_player = game.ordered_players[game.active_player_index]
             socketio.emit("your turn", room=next_player.sid)
-            trick_obj = {}
-            for player, card in game.trick.items():
-                card_list = [card.value, card.suit]
-                trick_obj[player.name]=card_list
-            print(trick_obj)
-            socketio.emit("show trick", trick_obj)
+
     else:
         print("its either not your turn, or its bidding time")
 
-
-
-
+# TODO: Prevent user from having the same name as another user
+# TODO: Let all the info sit on screen, put in a button to let the
+# TODO: players progress to the next round when they want to
+# TODO: Make another socketio.emit to show each player's bid in a table
+# TODO: probably into a new div called bidTable or something
 
 
 if __name__ == '__main__':

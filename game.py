@@ -14,12 +14,15 @@ class Game:
         self.ordered_players = None
         self.deck = []
         self.active_player_index = 0
+        self.winner_index = 0
+        self.winner_message = None
         self.state = "initializing"
         self.trump = None
         self.trump_value = None
         self.max_hand_size = None
         self.round = 1
         self.trick = {}
+        self.trick_obj = {}
         self.tricks_played = 0
         self.led_suit = None
         self.score_dict = {}
@@ -125,38 +128,49 @@ class Game:
                 self.led_suit = card.suit
 
             # If each player has played a card, resolve the trick
+            # Gives a printout for the terminal
             if len(self.trick) == len(self.players):
                 for key, value in self.trick.items():
                     print(f"{key.name.title()} played the {value.value} of {value.suit}")
                 winner = undtr.determine_winning_card(self.trick, self.led_suit, self.trump)
                 winner.tricks += 1
                 print(f"{winner.name.title()} won the trick and now has {winner.tricks} trick(s)")
-                winner_index = self.players.index(winner)
-                self.trick = {}
+                self.winner_index = self.players.index(winner)
                 self.tricks_played += 1
 
-                # Pass priority to whoever won the trick
-                self.ordered_players = self.players[winner_index:] + self.players[:winner_index]
+                # Decides whether the state should be between tricks or between rounds
+                if self.tricks_played == self.max_hand_size:
+                    self.winner_message = f"{winner.name.title()} won the trick!"
 
-            # Once all players' hands are empty
-            # This is all a lot of clean up that could be organized better
-            if self.tricks_played == self.max_hand_size:
-                self.round += 1
-                self.state = "bidding"
-                self.tally_scores()
-                self.check_end_game()
-                if self.state == "bidding":
-                    for player in self.players:
-                        player.tricks = 0
-                    self.tricks_played = 0
-                    self.create_deck()
-                    self.deal_cards()
-                    self.determine_trump()
-                    self.bids_collected = 0
-                    # This makes sure the following round starts with the next player in the circle
-                    next_dealer = self.players[(self.round - 1) % len(self.players)]
-                    next_dealer_index = self.players.index(next_dealer)
-                    self.ordered_players = self.players[next_dealer_index:] + self.players[:next_dealer_index]
+    def between_tricks(self):
+        # Pass priority to whoever won the trick
+        if self.state == "between_tricks":
+            self.trick = {}
+            self.trick_obj = {}
+            self.ordered_players = self.players[self.winner_index:] + self.players[:self.winner_index]
+            self.state = "playing"
+
+    def between_rounds(self):
+        # Once all players' hands are empty
+        # This is all a lot of clean up that could be organized better
+        if self.state == "between rounds":
+            self.active_player_index = 0
+            self.round += 1
+            self.state = "bidding"
+            self.tally_scores()
+            self.check_end_game()
+            if self.state == "bidding":
+                for player in self.players:
+                    player.tricks = 0
+                self.tricks_played = 0
+                self.create_deck()
+                self.deal_cards()
+                self.determine_trump()
+                self.bids_collected = 0
+                # This makes sure the following round starts with the next player in the circle
+                next_dealer = self.players[(self.round - 1) % len(self.players)]
+                next_dealer_index = self.players.index(next_dealer)
+                self.ordered_players = self.players[next_dealer_index:] + self.players[:next_dealer_index]
 
     def tally_scores(self):
         for player in self.players:

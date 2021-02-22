@@ -38,6 +38,8 @@ $("#content").on("click", ".hand", function(){
   $("#info").html("")
 })
 
+
+
 // Takes each player's hand and displays it to each respective client
 // Also shows the trump card to each client
 socket.on("deal hand", function(hand) {
@@ -99,6 +101,30 @@ socket.on("show trick", function(trick){
                     </div>')
   }
   $("#trick").html(trickArray)
+})
+
+// Function that gets called when a trick has ended
+// Generates a button that allows the users to proceed to the next trick
+// Need to edit this function: if there's another trick in the round, continue
+// If there are no more tricks in the round, the button needs to be different
+// Actually, have that take place in the listener function for the button press
+// Check tricks played vs max hand size - have that be on the event handler for the button press
+socket.on("end trick", function(msg){
+  $("#info").html("The trick has ended. "+msg)
+  $("#info").append('<form action="" id="nextTrick">\
+                      <input type="submit" value="Continue">\
+                    </form>')
+})
+
+// Function that gets called when a round has ended
+// Generates a button that allows the users to proceed to the next round
+// Also tells the users who made their bids, who scored how many tricks, etc
+// THIS FUNCTION ISN'T CALLED AT ALL AT THE MOMENT, NEED TO FIX END TRICK FUNCTION
+socket.on("end round", function(msg){
+  $("#info").html("The round has ended. "+msg)
+  $("#info").append('<form action="" id="nextRound">\
+                      <input type="submit" value="Start next round">\
+                    </form>')
 })
 
 // Function to receive the trump from the server.
