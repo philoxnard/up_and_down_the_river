@@ -7,7 +7,7 @@ $('#content').on("submit", "#getPlayer", function(e) {
   let user_name = $( 'input.name' ).val()
   console.log(socket.id)
   socket.emit('new user', user_name, socket.id)
-  $('#content').html('<form action="" id="start">\
+  $('#info').html('<form action="" id="start">\
                         <input type="submit" value="Start the game">\
                       </form>')  
 })
@@ -35,13 +35,18 @@ $("#content").on("submit", "#getBid", function(e){
 $("#content").on("click", ".hand", function(){
   let index = $(this).attr("id");
   socket.emit("play card", index, socket.id)
+  $("#info").html("")
 })
 
 // Takes each player's hand and displays it to each respective client
 // Also shows the trump card to each client
 socket.on("deal hand", function(hand) {
+  let trumpCard = getTrump(hand)
+  delete hand["trump"]
   let shownHand = showHand(hand)
-  $('#content').html(shownHand)
+  $("#info").html("")
+  $('#hand').html(shownHand)
+  $("#trump").html("Trump card is: "+trumpCard)
   socket.emit("request bid")
 })
 
@@ -49,7 +54,7 @@ socket.on("deal hand", function(hand) {
 // only displays to whoever's turn it is
 socket.on("make bid field", function(){
   let bidField = getBidField()
-  $('#content').append(bidField)
+  $('#info').append(bidField)
 })
 
 // Quick bounce from server to client back to server
@@ -63,18 +68,37 @@ socket.on("get next bid", function(){
 socket.on("update hand", function(hand){
   let handArray = getHandArray(hand)
   let shownHand ='hand:'+handArray
-  $("#content").html(shownHand)
-  // TODO: Alter both this code here and the general code on how a hand is displayed
-  // TODO: to make it so that updating the hand only replaces a hand div that's inside
-  // TODO: the content div. There should be a hand div, a trump div, and maybe
-  // TODO: a bid div, as well as some other informational divs to add in there later
-  // TODO: like name, score, whose turn it is, what everyone else has bid so far.
+  $("#hand").html(shownHand)
 })
 
 // Appends a simple string indicating whose turn it is
 // Only appears for whoever's turn it is
 socket.on("your turn", function(){
-  $("#content").append("Its your turn to play a card")
+  $("#info").html("Its your turn to play a card")
+})
+
+// Shows the current trick to everybody
+socket.on("show trick", function(trick){
+  console.log("trying to show trick")
+  let trickArray = ""
+  for (let name in trick){
+    let color
+    let value = trick[name][0]
+    let suit = trick[name][1]
+    if (suit == "&clubsuit;" || suit == "&spadesuit;"){
+      color = "black"
+    }
+    else{
+      color = "red"
+    }
+    trickArray += (name+'\'s card:\
+                    <div class="'+color+' hand card">\
+                    <div class="top">'+value+' '+suit+'</div>\
+                    <h1>'+suit+'</h1>\
+                    <div class="bottom">'+value+' '+suit+'</div>\
+                    </div>')
+  }
+  $("#trick").html(trickArray)
 })
 
 // Function to receive the trump from the server.
@@ -82,7 +106,6 @@ socket.on("your turn", function(){
 // Takes the player's hand object as an argument
 // Returns a string of html that displays a card
 function getTrump(hand){
-  
   let trump = hand["trump"]
   let trumpValue = trump[0]
   let trumpSuit = trump[1]
@@ -147,9 +170,7 @@ function getBidField(){
 // Returns a string of html that includes the player hand and the trump card
 function showHand(hand){
   console.log(hand)
-  let trumpCard = getTrump(hand)
-  delete hand["trump"]
   let handArray = getHandArray(hand)
-  let showHand ='hand:'+handArray+'<br><br>'+'trump card:'+trumpCard+'<br><br>'
+  let showHand ='hand:'+handArray
   return showHand
 }

@@ -97,6 +97,7 @@ def handle_card_click_event(index, sid, methods=["GET", "POST"]):
     :param index: String of the clicked card's numerical index in the player hand
     :param sid: String of socket ID from the player who clicked their card
     :return: List player.hand of the player who played a card
+    :return: Dictionary {player name: [card value, card suit]} to be read as active trick
     """
     active_player = game.ordered_players[game.active_player_index]
     if active_player.sid == sid and game.state=="playing":
@@ -105,11 +106,23 @@ def handle_card_click_event(index, sid, methods=["GET", "POST"]):
         game.active_player_index += 1
         if game.active_player_index == len(game.ordered_players):
             game.active_player_index = 0
-            # Put in some code here to re deal hands I guess?
+            # TODO: Create an "end round" function
+            # TODO: Somehow make it happen after all the following code
+            # TODO: Let all the info sit on screen, put in a button to let the
+            # TODO: players progress to the next round when they want to
+            # TODO: Make another socketio.emit to show each player's bid in a table
+            # TODO: probably into a new div called bidTable or something
+            socketio.emit("end round")
         else:
             socketio.emit("update hand", active_player.hand, room=active_player.sid)
             next_player = game.ordered_players[game.active_player_index]
             socketio.emit("your turn", room=next_player.sid)
+            trick_obj = {}
+            for player, card in game.trick.items():
+                card_list = [card.value, card.suit]
+                trick_obj[player.name]=card_list
+            print(trick_obj)
+            socketio.emit("show trick", trick_obj)
     else:
         print("its either not your turn, or its bidding time")
 
