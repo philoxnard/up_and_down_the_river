@@ -30,23 +30,26 @@ def handle_new_user_event(name, sid, methods=['GET', "POST"]):
 @socketio.on("round start")
 def handle_game_start_event(methods=["GET", "POST"]):
     """
-    Event handler for when all players have been entered and the "Start Game"
-    button gets clicked. Creates and shuffles the deck, deals out the cards, and 
+    Event handler for when a new round starts, whether by all players having been
+    entered and the "Start Game" button gets clicked, or by continuing after a 
+    prior round has ended. Creates and shuffles the deck, deals out the cards, and 
     determines the trump card. Note that the trump is passed to each player as part
     of the object that this function returns, but it is not a part of their hand
 
     :return: Dictionary with the trump card and the player's hand, received by client
     as a Javastring object
     """
-    print("start the round")
-    game.start_round()
-    for player in game.ordered_players:
-        hand_dict = {
-            "trump": [game.trump_value, game.trump]
-        }
-        for card in player.hand:
-            hand_dict[card.value]=card.suit
-        socketio.emit("deal hand", hand_dict, room=player.sid)
+    if not game.round_already_started:
+        game.round_already_started = True
+        print("start the round")
+        game.start_round()
+        for player in game.ordered_players:
+            hand_dict = {
+                "trump": [game.trump_value, game.trump]
+            }
+            for card in player.hand:
+                hand_dict[card.value]=card.suit
+            socketio.emit("deal hand", hand_dict, room=player.sid)
 
 @socketio.on("request bid")
 def handle_start_bidding_event(methods=["GET", "POST"]):
@@ -105,7 +108,12 @@ def handle_card_click_event(index, sid, methods=["GET", "POST"]):
         for player, card in game.trick.items():
             card_list = [card.value, card.suit]
             game.trick_obj[player.name]=card_list
-        socketio.emit("update hand", active_player.hand, room=active_player.sid)
+        hand = {}
+        for card in active_player.hand:
+            hand[card.value]=card.suit
+        print(active_player.hand)
+        print(active_player.sid)
+        socketio.emit("update hand", hand, room=active_player.sid)
         socketio.emit("show trick", game.trick_obj)
         print(f"{game.trick_obj}")
         game.active_player_index += 1
@@ -118,11 +126,39 @@ def handle_card_click_event(index, sid, methods=["GET", "POST"]):
     else:
         print("its either not your turn, or its bidding time")
 
+@socketio.on("continue")
+def handle_continue_event(methods=["GET", "POST"]):
+    """
+    Event handler for when a user clicks the "continue" button that appears after the end of a trick.
+    If there are more tricks to be played, this function will continue to the rest of the round. If
+    there are no more tricks to be played in the current round, this function will end the round, 
+    reset the decks, hands, and trumps, and will start the next round.
+
+    """
+    if game.state == "between rounds":
+        game.between_rounds()
+        socketio.emit("restart round")
+    elif game.state == "between tricks":
+        print("between tricks function not yet implemented")
+
+# Short term to do list:
+#
+# TODO: Implement functionality for going from trick to trick
+#       handle_continue_event when game.state == "between tricks"
+# TODO: Fix the bug where the card that gets played is seemingly random
+#       The index being passed from the client is correct, at least according
+#       to what the user sees on the client view.
+#       It's possibly that the order of the list on the server is somehow not
+#       the same order as the display for the client - that's the first thing
+#       to look into, I think.
+###################################################################
+# Long term to do list:
+#
 # TODO: Prevent user from having the same name as another user
-# TODO: Let all the info sit on screen, put in a button to let the
-# TODO: players progress to the next round when they want to
 # TODO: Make another socketio.emit to show each player's bid in a table
 # TODO: probably into a new div called bidTable or something
+# TODO: Make it so clicking your hand doesn't remove bid field
+#           probably put it in the update hand client function
 
 
 if __name__ == '__main__':

@@ -21,6 +21,7 @@ class Game:
         self.trump_value = None
         self.max_hand_size = None
         self.round = 1
+        self.round_already_started = False
         self.trick = {}
         self.trick_obj = {}
         self.tricks_played = 0
@@ -141,10 +142,11 @@ class Game:
                 # Decides whether the state should be between tricks or between rounds
                 if self.tricks_played == self.max_hand_size:
                     self.winner_message = f"{winner.name.title()} won the trick!"
+                    self.state = "between rounds"
 
     def between_tricks(self):
         # Pass priority to whoever won the trick
-        if self.state == "between_tricks":
+        if self.state == "between tricks":
             self.trick = {}
             self.trick_obj = {}
             self.ordered_players = self.players[self.winner_index:] + self.players[:self.winner_index]
@@ -154,18 +156,20 @@ class Game:
         # Once all players' hands are empty
         # This is all a lot of clean up that could be organized better
         if self.state == "between rounds":
+            self.trick = {}
+            self.trick_obj = {}
             self.active_player_index = 0
             self.round += 1
             self.state = "bidding"
+            self.round_already_started = False
             self.tally_scores()
             self.check_end_game()
             if self.state == "bidding":
                 for player in self.players:
                     player.tricks = 0
+                    player.bid_active = False
+                    player.bid = 0
                 self.tricks_played = 0
-                self.create_deck()
-                self.deal_cards()
-                self.determine_trump()
                 self.bids_collected = 0
                 # This makes sure the following round starts with the next player in the circle
                 next_dealer = self.players[(self.round - 1) % len(self.players)]
@@ -176,7 +180,7 @@ class Game:
         for player in self.players:
             player.score += player.tricks
             print(f"{player.name.title()} had a bid of {player.bid}")
-            print(f"{player.name.title()} won {player.tricks}")
+            print(f"{player.name.title()} won {player.tricks} tricks")
             if player.bid == player.tricks:
                 player.score += 10
                 print(f"{player.name.title()} made their bid!")

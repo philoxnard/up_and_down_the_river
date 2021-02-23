@@ -34,11 +34,18 @@ $("#content").on("submit", "#getBid", function(e){
 // Takes the clicked card and sends it through the game.play_card method
 $("#content").on("click", ".hand", function(){
   let index = $(this).attr("id");
+  console.log(index)
   socket.emit("play card", index, socket.id)
   $("#info").html("")
 })
 
-
+// When someone clicks the "continue" button after a trick is done, this will 
+// bounce info back to the server, which will then determine whether to continue to
+// the next trick, or to start a new round.
+$("#content").on("submit", "#continue", function(e){
+  e.preventDefault()
+  socket.emit("continue")
+})
 
 // Takes each player's hand and displays it to each respective client
 // Also shows the trump card to each client
@@ -49,6 +56,7 @@ socket.on("deal hand", function(hand) {
   $("#info").html("")
   $('#hand').html(shownHand)
   $("#trump").html("Trump card is: "+trumpCard)
+  $("#trick").html("")
   socket.emit("request bid")
 })
 
@@ -105,26 +113,17 @@ socket.on("show trick", function(trick){
 
 // Function that gets called when a trick has ended
 // Generates a button that allows the users to proceed to the next trick
-// Need to edit this function: if there's another trick in the round, continue
-// If there are no more tricks in the round, the button needs to be different
-// Actually, have that take place in the listener function for the button press
-// Check tricks played vs max hand size - have that be on the event handler for the button press
 socket.on("end trick", function(msg){
   $("#info").html("The trick has ended. "+msg)
-  $("#info").append('<form action="" id="nextTrick">\
+  $("#info").append('<form action="" id="continue">\
                       <input type="submit" value="Continue">\
                     </form>')
 })
 
-// Function that gets called when a round has ended
-// Generates a button that allows the users to proceed to the next round
-// Also tells the users who made their bids, who scored how many tricks, etc
-// THIS FUNCTION ISN'T CALLED AT ALL AT THE MOMENT, NEED TO FIX END TRICK FUNCTION
-socket.on("end round", function(msg){
-  $("#info").html("The round has ended. "+msg)
-  $("#info").append('<form action="" id="nextRound">\
-                      <input type="submit" value="Start next round">\
-                    </form>')
+// Simple bounce function if the continue button gets clicked at the end
+// of a round. Bounces back to the round start server function
+socket.on("restart round", function(){
+  socket.emit("round start")
 })
 
 // Function to receive the trump from the server.
@@ -157,8 +156,8 @@ function getTrump(hand){
 function getHandArray(hand){
   let handArray = ""
   console.log(hand)
+  let index = 0
   for (var card in hand) {
-    let index = 0
     let value = card
     let suit = hand[card]
     let color
