@@ -136,12 +136,12 @@ class Game:
                 winner = undtr.determine_winning_card(self.trick, self.led_suit, self.trump)
                 winner.tricks += 1
                 print(f"{winner.name.title()} won the trick and now has {winner.tricks} trick(s)")
+                self.winner_message = f"{winner.name.title()} won the trick!"
                 self.winner_index = self.players.index(winner)
                 self.tricks_played += 1
 
                 # Decides whether the state should be between tricks or between rounds
                 if self.tricks_played == self.max_hand_size:
-                    self.winner_message = f"{winner.name.title()} won the trick!"
                     self.state = "between rounds"
                 else:
                     self.state = "between tricks"

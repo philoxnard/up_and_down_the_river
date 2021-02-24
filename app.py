@@ -102,31 +102,32 @@ def handle_card_click_event(index, sid, methods=["GET", "POST"]):
     :return: List player.hand of the player who played a card
     :return: Dictionary {player name: [card value, card suit]} to be read as active trick
     """
-    print(index)
-    active_player = game.ordered_players[game.active_player_index]
-    print(active_player.hand)
-    if active_player.sid == sid and game.state=="playing":
-        game.play_card(int(index), active_player)
-        for player, card in game.trick.items():
-            card_list = [card.value, card.suit]
-            game.trick_obj[player.name]=card_list
-        hand_dict = {}
-        for i, card in enumerate(player.hand):
-            hand_dict[i]=[card.value, card.suit]
+    if game.state == "playing":
+        print(index)
+        active_player = game.ordered_players[game.active_player_index]
         print(active_player.hand)
-        print(active_player.sid)
-        socketio.emit("update hand", hand_dict, room=active_player.sid)
-        socketio.emit("show trick", game.trick_obj)
-        print(f"{game.trick_obj}")
-        game.active_player_index += 1
-        if game.active_player_index == len(game.players):
-            socketio.emit("end trick", game.winner_message)
-        else:
-            next_player = game.ordered_players[game.active_player_index]
-            socketio.emit("your turn", room=next_player.sid)
-
+        if active_player.sid == sid:
+            game.play_card(int(index), active_player)
+            for player, card in game.trick.items():
+                card_list = [card.value, card.suit]
+                game.trick_obj[player.name]=card_list
+            hand_dict = {}
+            for i, card in enumerate(player.hand):
+                hand_dict[i]=[card.value, card.suit]
+            print(active_player.hand)
+            print(active_player.sid)
+            socketio.emit("update hand", hand_dict, room=active_player.sid)
+            socketio.emit("show trick", game.trick_obj)
+            print(f"{game.trick_obj}")
+            game.active_player_index += 1
+            if game.active_player_index == len(game.players):
+                socketio.emit("end trick", game.winner_message)
+            else:
+                next_player = game.ordered_players[game.active_player_index]
+                socketio.emit("your turn", room=next_player.sid)
+        else:("Its not your turn")
     else:
-        print("its either not your turn, or its bidding time")
+        print("its not time for that")
 
 @socketio.on("continue")
 def handle_continue_event(methods=["GET", "POST"]):
@@ -152,11 +153,7 @@ def handle_new_trick_event(methods=["GET", "POST"]):
 # Short term to do list:
 # TODO: Fix the New Trick function to properly display to the active player that
 #       it is their turn.
-#
-# BUG : The game always knows who wins the trick, but the display message
-#       often indicates the incorrect winner. To be looked into, but shouldn't
-#       be a huge issue b/c the game correctly passes the lead to whoever
-#       the trick winner ought to be
+# TODO: Implement some kinda function for the end of the game
 #       handle_continue_event when game.state == "between tricks"
 # BUG : One of the hands in a test weirdly didn't display the entire hand, despite
 #       the entire hand being recognized on the server... no idea what happened there
