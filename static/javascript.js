@@ -44,6 +44,7 @@ $("#content").on("click", ".hand", function(){
 // the next trick, or to start a new round.
 $("#content").on("submit", "#continue", function(e){
   e.preventDefault()
+  $("#info").html("")
   socket.emit("continue")
 })
 
@@ -124,6 +125,15 @@ socket.on("end trick", function(msg){
 // of a round. Bounces back to the round start server function
 socket.on("restart round", function(){
   socket.emit("round start")
+})
+
+// Function called when going between tricks within the same round
+// Clears out the current trick display on the table, clears the info section
+// Then, bounces back to server to allow play to continue
+socket.on("next trick", function(){
+  $("#info").html("")
+  $("#trick").html("")
+  //socket.emit("new trick")
 })
 
 // Function to receive the trump from the server.

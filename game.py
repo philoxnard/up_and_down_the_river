@@ -143,10 +143,13 @@ class Game:
                 if self.tricks_played == self.max_hand_size:
                     self.winner_message = f"{winner.name.title()} won the trick!"
                     self.state = "between rounds"
+                else:
+                    self.state = "between tricks"
 
     def between_tricks(self):
         # Pass priority to whoever won the trick
         if self.state == "between tricks":
+            self.active_player_index = 0
             self.trick = {}
             self.trick_obj = {}
             self.ordered_players = self.players[self.winner_index:] + self.players[:self.winner_index]

@@ -141,25 +141,31 @@ def handle_continue_event(methods=["GET", "POST"]):
         game.between_rounds()
         socketio.emit("restart round")
     elif game.state == "between tricks":
-        print("between tricks function not yet implemented")
+        game.between_tricks()
+        socketio.emit("next trick")
+
+@socketio.on("new trick")
+def handle_new_trick_event(methods=["GET", "POST"]):
+    active_player = game.ordered_players[game.active_player_index]
+    socketio.emit("your turn", room=active_player.sid)
 
 # Short term to do list:
+# TODO: Fix the New Trick function to properly display to the active player that
+#       it is their turn.
 #
-# TODO: Implement functionality for going from trick to trick
+# BUG : The game always knows who wins the trick, but the display message
+#       often indicates the incorrect winner. To be looked into, but shouldn't
+#       be a huge issue b/c the game correctly passes the lead to whoever
+#       the trick winner ought to be
 #       handle_continue_event when game.state == "between tricks"
-# TODO: Fix the bug where the card that gets played is seemingly random
-#       The index being passed from the client is correct, at least according
-#       to what the user sees on the client view.
-#       PROBLEM: The lists that make up each player's hands are not necessarily in
-#                the same order on the server as they are in the client - no idea
-#                why at the moment, no discernable pattern as of yet.
-#       SOLUTION: send each card index to the client and somehow display the hand
-#                   in order of index
 # BUG : One of the hands in a test weirdly didn't display the entire hand, despite
 #       the entire hand being recognized on the server... no idea what happened there
+#               Only saw this bug once, and changed up the code since then, so it may
+#               be gone? I'll update this if I ever see it again but I think its gone
 ###################################################################
 # Long term to do list:
 #
+# TODO: Give some indication if it isn't your turn
 # TODO: Prevent user from having the same name as another user
 # TODO: Make another socketio.emit to show each player's bid in a table
 # TODO: probably into a new div called bidTable or something
