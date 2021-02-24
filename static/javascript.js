@@ -156,10 +156,10 @@ function getTrump(hand){
 function getHandArray(hand){
   let handArray = ""
   console.log(hand)
-  let index = 0
-  for (var card in hand) {
-    let value = card
-    let suit = hand[card]
+  for (let index = 0; index<Object.keys(hand).length; index++) {
+    var cardInfo = hand[index]
+    let value = cardInfo[0]
+    let suit = cardInfo[1]
     let color
     if (suit == "&clubsuit;" || suit == "&spadesuit;"){
       color = "black"
@@ -172,7 +172,6 @@ function getHandArray(hand){
                 <h1>'+suit+'</h1>\
                 <div class="bottom">'+value+' '+suit+'</div>\
                 </div>')
-    index += 1
   }
   return handArray
 }

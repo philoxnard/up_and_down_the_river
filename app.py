@@ -47,8 +47,8 @@ def handle_game_start_event(methods=["GET", "POST"]):
             hand_dict = {
                 "trump": [game.trump_value, game.trump]
             }
-            for card in player.hand:
-                hand_dict[card.value]=card.suit
+            for i, card in enumerate(player.hand):
+                hand_dict[i]=[card.value, card.suit]
             socketio.emit("deal hand", hand_dict, room=player.sid)
 
 @socketio.on("request bid")
@@ -102,18 +102,20 @@ def handle_card_click_event(index, sid, methods=["GET", "POST"]):
     :return: List player.hand of the player who played a card
     :return: Dictionary {player name: [card value, card suit]} to be read as active trick
     """
+    print(index)
     active_player = game.ordered_players[game.active_player_index]
+    print(active_player.hand)
     if active_player.sid == sid and game.state=="playing":
         game.play_card(int(index), active_player)
         for player, card in game.trick.items():
             card_list = [card.value, card.suit]
             game.trick_obj[player.name]=card_list
-        hand = {}
-        for card in active_player.hand:
-            hand[card.value]=card.suit
+        hand_dict = {}
+        for i, card in enumerate(player.hand):
+            hand_dict[i]=[card.value, card.suit]
         print(active_player.hand)
         print(active_player.sid)
-        socketio.emit("update hand", hand, room=active_player.sid)
+        socketio.emit("update hand", hand_dict, room=active_player.sid)
         socketio.emit("show trick", game.trick_obj)
         print(f"{game.trick_obj}")
         game.active_player_index += 1
@@ -148,9 +150,13 @@ def handle_continue_event(methods=["GET", "POST"]):
 # TODO: Fix the bug where the card that gets played is seemingly random
 #       The index being passed from the client is correct, at least according
 #       to what the user sees on the client view.
-#       It's possibly that the order of the list on the server is somehow not
-#       the same order as the display for the client - that's the first thing
-#       to look into, I think.
+#       PROBLEM: The lists that make up each player's hands are not necessarily in
+#                the same order on the server as they are in the client - no idea
+#                why at the moment, no discernable pattern as of yet.
+#       SOLUTION: send each card index to the client and somehow display the hand
+#                   in order of index
+# BUG : One of the hands in a test weirdly didn't display the entire hand, despite
+#       the entire hand being recognized on the server... no idea what happened there
 ###################################################################
 # Long term to do list:
 #
