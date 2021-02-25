@@ -74,6 +74,26 @@ socket.on("get next bid", function(){
   socket.emit("request bid")
 })
 
+// Function to display a table with all the player's bids. Generated and updated
+// After each player submits their bid
+// TODO: Will likely need to pass index along in the bids obj and do this the 
+//        same way that I did the showHand function to get it in the right order
+socket.on("show bidTable", function(bids){ 
+  let bidTable = "<table>\
+                    <tr>\
+                      <th>Player</th>\
+                      <th>Bid</th>\
+                    </tr>"
+  for (bid in bids){
+    let player = bids[bid]
+    bidTable += " <tr>\
+                    <td>"+player+"</td>\
+                    <td>"+bid+"</td>\
+                  </tr>"
+  }
+  $("#bidTable").html(bidTable+"</table>")
+})
+
 // After playing a card, this updates the client's view to what cards are still in
 // their hand. 
 socket.on("update hand", function(hand){
@@ -121,9 +141,27 @@ socket.on("end trick", function(msg){
                     </form>')
 })
 
+socket.on("update trick table", function(tricks){
+  let trickTable = "<table>\
+                    <tr>\
+                      <th>Player</th>\
+                      <th>Tricks Won</th>\
+                    </tr>"
+  for (trick in tricks){
+    let player = tricks[trick]
+    trickTable += " <tr>\
+                    <td>"+player+"</td>\
+                    <td>"+trick+"</td>\
+                  </tr>"
+  }
+  $("#trickTable").html(trickTable+"</table>")  
+})
+
 // Simple bounce function if the continue button gets clicked at the end
 // of a round. Bounces back to the round start server function
 socket.on("restart round", function(){
+  $("#bidTable").html("")
+  $("#trickTable").html("")
   socket.emit("round start")
 })
 
@@ -133,7 +171,7 @@ socket.on("restart round", function(){
 socket.on("next trick", function(){
   $("#info").html("")
   $("#trick").html("")
-  //socket.emit("new trick")
+  socket.emit("new trick")
 })
 
 // Function to receive the trump from the server.

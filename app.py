@@ -1,7 +1,22 @@
 from flask import Flask, render_template, jsonify
 from flask_socketio import SocketIO, send
+import logging
+import datetime
+import os
+import sys
 
 from game import Game
+
+today = datetime.date.today()
+date_str = today.strftime("%d_%m_%Y_%H_%M")
+log_path = f"{os.path.dirname(__file__)}/logs/{date_str}.log"
+file_handler = logging.FileHandler(log_path)
+stream_handler = logging.StreamHandler()
+handlers = [file_handler, stream_handler]
+
+logging.basicConfig(handlers=handlers, encoding="utf-8", level=logging.DEBUG)
+logging.debug("Starting app")
+
 
 game = Game()
 
@@ -85,8 +100,11 @@ def handle_bid(bid, sid, methods=["GET", "POST"]):
     game.set_player_bid(bid, sid)
     game.active_player_index += 1
     socketio.emit("get next bid")
+    bid_dict = {}
     for player in game.ordered_players:
         print(f"{player.name}'s bid is {player.bid}")
+        bid_dict[player.name.title()]=player.bid
+    socketio.emit("show bidTable", bid_dict)
 
 @socketio.on("play card")
 def handle_card_click_event(index, sid, methods=["GET", "POST"]):
@@ -121,7 +139,11 @@ def handle_card_click_event(index, sid, methods=["GET", "POST"]):
             print(f"{game.trick_obj}")
             game.active_player_index += 1
             if game.active_player_index == len(game.players):
+                trick_table_dict = {}
+                for player in game.ordered_players:
+                    trick_table_dict[player.name.title()]=player.tricks
                 socketio.emit("end trick", game.winner_message)
+                socketio.emit("update trick table", trick_table_dict)
             else:
                 next_player = game.ordered_players[game.active_player_index]
                 socketio.emit("your turn", room=next_player.sid)
@@ -151,21 +173,17 @@ def handle_new_trick_event(methods=["GET", "POST"]):
     socketio.emit("your turn", room=active_player.sid)
 
 # Short term to do list:
-# TODO: Fix the New Trick function to properly display to the active player that
-#       it is their turn.
 # TODO: Implement some kinda function for the end of the game
-#       handle_continue_event when game.state == "between tricks"
-# BUG : One of the hands in a test weirdly didn't display the entire hand, despite
-#       the entire hand being recognized on the server... no idea what happened there
-#               Only saw this bug once, and changed up the code since then, so it may
-#               be gone? I'll update this if I ever see it again but I think its gone
+#
 ###################################################################
+#
 # Long term to do list:
 #
+# TODO: Make bidTable and trickTable prettier and inline with each other to save space
+# TODO: Make the entire thing prettier tbh, put it on background of dark green
+# TODO: Replace print statements with logging statements
 # TODO: Give some indication if it isn't your turn
 # TODO: Prevent user from having the same name as another user
-# TODO: Make another socketio.emit to show each player's bid in a table
-# TODO: probably into a new div called bidTable or something
 # TODO: Make it so clicking your hand doesn't remove bid field
 #           probably put it in the update hand client function
 
