@@ -174,15 +174,15 @@ def handle_new_trick_event(methods=["GET", "POST"]):
 
 # Short term to do list:
 # TODO: Implement some kinda function for the end of the game
+# TODO: Force the players to follow the rules - force them to follow suit if able
 #
 ###################################################################
 #
 # Long term to do list:
 #
-# TODO: Make bidTable and trickTable prettier and inline with each other to save space
-# TODO: Make the entire thing prettier tbh, put it on background of dark green
 # TODO: Replace print statements with logging statements
 # TODO: Give some indication if it isn't your turn
+# TODO: Can make it even prettier, but its not hoooooorrible right now
 # TODO: Prevent user from having the same name as another user
 # TODO: Make it so clicking your hand doesn't remove bid field
 #           probably put it in the update hand client function

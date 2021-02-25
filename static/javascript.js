@@ -98,7 +98,7 @@ socket.on("show bidTable", function(bids){
 // their hand. 
 socket.on("update hand", function(hand){
   let handArray = getHandArray(hand)
-  let shownHand ='hand:'+handArray
+  let shownHand = 'hand:'+handArray
   $("#hand").html(shownHand)
 })
 
