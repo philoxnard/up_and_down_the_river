@@ -184,24 +184,28 @@ class Game:
             player.score += player.tricks
             print(f"{player.name.title()} had a bid of {player.bid}")
             print(f"{player.name.title()} won {player.tricks} tricks")
-            if player.bid == player.tricks:
+            if int(player.bid) == int(player.tricks):
                 player.score += 10
                 print(f"{player.name.title()} made their bid!")
 
     def check_end_game(self):
         if self.round == 14:
-            self.state="game_over"
+            self.state="game over"
             self.get_score()
 
     def get_score(self):
-        if self.state == "game_over":
+        if self.state == "game over":
             for player in self.players:
                 self.score_dict[player.name] = player.score
             self.determine_winning_player()
 
     def determine_winning_player(self):
         winner = max(self.score_dict, key=self.score_dict.get)
-        print(winner.title + "wins the game!")
+        win_msg = winner.title() + " wins the game!"
+        self.score_dict["msg"] = win_msg
+        print("game over")
+        print(win_msg)
+        
 
     # The following methods are used in the execute_round method
 

@@ -162,10 +162,13 @@ def handle_continue_event(methods=["GET", "POST"]):
     """
     if game.state == "between rounds":
         game.between_rounds()
-        socketio.emit("restart round")
+        if not game.state == "game over":
+            socketio.emit("restart round")
+        elif game.state == "game over":
+            socketio.emit("end game", game.score_dict)
     elif game.state == "between tricks":
         game.between_tricks()
-        socketio.emit("next trick")
+        socketio.emit("next trick") 
 
 @socketio.on("new trick")
 def handle_new_trick_event(methods=["GET", "POST"]):
@@ -173,20 +176,21 @@ def handle_new_trick_event(methods=["GET", "POST"]):
     socketio.emit("your turn", room=active_player.sid)
 
 # Short term to do list:
-# TODO: Implement some kinda function for the end of the game
 # TODO: Force the players to follow the rules - force them to follow suit if able
+# TODO: Refactor code to make the docs all a bit smaller and more manageable
+# TODO: Make bidTable and trickTable display in same order as each other
 #
 ###################################################################
 #
 # Long term to do list:
 #
+# TODO: Give players a button that restarts the game
 # TODO: Replace print statements with logging statements
 # TODO: Give some indication if it isn't your turn
 # TODO: Can make it even prettier, but its not hoooooorrible right now
 # TODO: Prevent user from having the same name as another user
-# TODO: Make it so clicking your hand doesn't remove bid field
-#           probably put it in the update hand client function
+# TODO: Make some fun emojis or something for if people do or don't make their bids
 
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    socketio.run(app, port=5000, host="0.0.0.0", debug=True)

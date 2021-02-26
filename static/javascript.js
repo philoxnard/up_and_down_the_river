@@ -36,7 +36,6 @@ $("#content").on("click", ".hand", function(){
   let index = $(this).attr("id");
   console.log(index)
   socket.emit("play card", index, socket.id)
-  $("#info").html("")
 })
 
 // When someone clicks the "continue" button after a trick is done, this will 
@@ -84,8 +83,8 @@ socket.on("show bidTable", function(bids){
                       <th>Player</th>\
                       <th>Bid</th>\
                     </tr>"
-  for (bid in bids){
-    let player = bids[bid]
+  for (player in bids){
+    let bid = bids[player]
     bidTable += " <tr>\
                     <td>"+player+"</td>\
                     <td>"+bid+"</td>\
@@ -99,6 +98,7 @@ socket.on("show bidTable", function(bids){
 socket.on("update hand", function(hand){
   let handArray = getHandArray(hand)
   let shownHand = 'hand:'+handArray
+  $("#info").html("")
   $("#hand").html(shownHand)
 })
 
@@ -115,6 +115,7 @@ socket.on("show trick", function(trick){
   for (let name in trick){
     let color
     let value = trick[name][0]
+    value = faceCards(value)
     let suit = trick[name][1]
     if (suit == "&clubsuit;" || suit == "&spadesuit;"){
       color = "black"
@@ -125,7 +126,7 @@ socket.on("show trick", function(trick){
     trickArray += (name+'\'s card:\
                     <div class="'+color+' hand card">\
                     <div class="top">'+value+' '+suit+'</div>\
-                    <h1>'+suit+'</h1>\
+                    <h1>'+value+suit+'</h1>\
                     <div class="bottom">'+value+' '+suit+'</div>\
                     </div>')
   }
@@ -141,14 +142,16 @@ socket.on("end trick", function(msg){
                     </form>')
 })
 
+// Function that gets called every time a trick ends
+// Updates the trickTable div with how many tricks each player has won in the round
 socket.on("update trick table", function(tricks){
   let trickTable = "<table>\
                     <tr>\
                       <th>Player</th>\
                       <th>Tricks Won</th>\
                     </tr>"
-  for (trick in tricks){
-    let player = tricks[trick]
+  for (player in tricks){
+    let trick = tricks[player]
     trickTable += " <tr>\
                     <td>"+player+"</td>\
                     <td>"+trick+"</td>\
@@ -174,6 +177,29 @@ socket.on("next trick", function(){
   socket.emit("new trick")
 })
 
+// Function called if the continue button is clicked after the end of a game
+// Displays the winner and the score table
+// NOTE: If you're going to make a restart button, have the jquery replace
+//        only #info, not all of #content, or at least make it recreate empty divs
+socket.on("end game", function(score_dict){
+  let win_msg = score_dict["msg"]
+  delete score_dict["msg"]
+  let scoreTable = "<table>\
+                    <tr>\
+                      <th>Player</th>\
+                      <th>Score</th>\
+                    </tr>"
+  for (player in score_dict){
+    let score = score_dict[player]
+    scoreTable += " <tr>\
+                      <td>"+player+"</td>\
+                      <td>"+score+"</td>\
+                    </tr>"
+  }
+  $("#content").html(win_msg)
+  $("#content").append(scoreTable)
+})
+
 // Function to receive the trump from the server.
 // The trump card is sent as part of each player's hand so its data can be extracted
 // Takes the player's hand object as an argument
@@ -181,6 +207,7 @@ socket.on("next trick", function(){
 function getTrump(hand){
   let trump = hand["trump"]
   let trumpValue = trump[0]
+  trumpValue = faceCards(trumpValue)
   let trumpSuit = trump[1]
   if (trumpSuit == "&clubsuit;" || trumpSuit == "&spadesuit;"){
     trumpColor = "black"
@@ -190,7 +217,7 @@ function getTrump(hand){
   }
   trumpCard = ('<div class="'+trumpColor+' card">\
               <div class="top">'+trumpValue+' '+trumpSuit+'</div>\
-              <h1>'+trumpSuit+'</h1>\
+              <h1>'+trumpValue+trumpSuit+'</h1>\
               <div class="bottom">'+trumpValue+' '+trumpSuit+'</div>\
               </div>')
   return trumpCard
@@ -205,8 +232,10 @@ function getHandArray(hand){
   let handArray = ""
   console.log(hand)
   for (let index = 0; index<Object.keys(hand).length; index++) {
+    
     var cardInfo = hand[index]
     let value = cardInfo[0]
+    value = faceCards(value)
     let suit = cardInfo[1]
     let color
     if (suit == "&clubsuit;" || suit == "&spadesuit;"){
@@ -217,7 +246,7 @@ function getHandArray(hand){
     }
     handArray+=('<div class="'+color+' hand card" id="'+index+'">\
                 <div class="top">'+value+' '+suit+'</div>\
-                <h1>'+suit+'</h1>\
+                <h1>'+value+suit+'</h1>\
                 <div class="bottom">'+value+' '+suit+'</div>\
                 </div>')
   }
@@ -245,4 +274,20 @@ function showHand(hand){
   let handArray = getHandArray(hand)
   let showHand ='hand:'+handArray
   return showHand
+}
+
+function faceCards(value){
+  if (value == 11){
+    value = "J"
+  } 
+  else if (value == 12){
+    value = "Q"
+  }
+  else if (value == 13){
+    value = "K"
+  }
+  else if (value == 14){
+    value = "A"
+  }
+  return value
 }

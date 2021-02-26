@@ -30,6 +30,7 @@ class Player:
         self.score = 0
         self.tricks = 0
         self.name = name
+        self.can_follow_suit = False
 
     def __repr__(self):
         sorted_hand = sort_cards(self.hand)
