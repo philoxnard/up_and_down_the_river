@@ -126,27 +126,30 @@ def handle_card_click_event(index, sid, methods=["GET", "POST"]):
         print(active_player.hand)
         if active_player.sid == sid:
             game.play_card(int(index), active_player)
-            for player, card in game.trick.items():
-                card_list = [card.value, card.suit]
-                game.trick_obj[player.name]=card_list
-            hand_dict = {}
-            for i, card in enumerate(player.hand):
-                hand_dict[i]=[card.value, card.suit]
-            print(active_player.hand)
-            print(active_player.sid)
-            socketio.emit("update hand", hand_dict, room=active_player.sid)
-            socketio.emit("show trick", game.trick_obj)
-            print(f"{game.trick_obj}")
-            game.active_player_index += 1
-            if game.active_player_index == len(game.players):
-                trick_table_dict = {}
-                for player in game.ordered_players:
-                    trick_table_dict[player.name.title()]=player.tricks
-                socketio.emit("end trick", game.winner_message)
-                socketio.emit("update trick table", trick_table_dict)
-            else:
-                next_player = game.ordered_players[game.active_player_index]
-                socketio.emit("your turn", room=next_player.sid)
+            if game.card_played == True:
+                game.card_played = False
+                for player, card in game.trick.items():
+                    card_list = [card.value, card.suit]
+                    game.trick_obj[player.name]=card_list
+                hand_dict = {}
+                for i, card in enumerate(player.hand):
+                    hand_dict[i]=[card.value, card.suit]
+                print(active_player.hand)
+                print(active_player.sid)
+                active_player.can_follow_suit = False
+                socketio.emit("update hand", hand_dict, room=active_player.sid)
+                socketio.emit("show trick", game.trick_obj)
+                print(f"{game.trick_obj}")
+                game.active_player_index += 1
+                if game.active_player_index == len(game.players):
+                    trick_table_dict = {}
+                    for player in game.ordered_players:
+                        trick_table_dict[player.name.title()]=player.tricks
+                    socketio.emit("end trick", game.winner_message)
+                    socketio.emit("update trick table", trick_table_dict)
+                else:
+                    next_player = game.ordered_players[game.active_player_index]
+                    socketio.emit("your turn", room=next_player.sid)
         else:("Its not your turn")
     else:
         print("its not time for that")
@@ -176,7 +179,6 @@ def handle_new_trick_event(methods=["GET", "POST"]):
     socketio.emit("your turn", room=active_player.sid)
 
 # Short term to do list:
-# TODO: Force the players to follow the rules - force them to follow suit if able
 # TODO: Refactor code to make the docs all a bit smaller and more manageable
 # TODO: Make bidTable and trickTable display in same order as each other
 #

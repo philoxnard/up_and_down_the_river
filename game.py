@@ -28,6 +28,7 @@ class Game:
         self.led_suit = None
         self.score_dict = {}
         self.bids_collected = 0
+        self.card_played = False
 
     # Method used for testing to show all the relevant information in the game
 
@@ -116,35 +117,43 @@ class Game:
             if self.bids_collected == len(self.players):
                 self.state = "playing"
 
-    def construct_cards_d(self):
-        pass
+    def check_if_can_follow_suit(self, hand_index, player):
+        for card in player.hand:
+            if card.suit == self.led_suit:
+                player.can_follow_suit = True
 
     def play_card(self, hand_index, player):
         if self.state == "playing":
-            card = player.hand.pop(hand_index)
-            self.trick[player] = card
-            
-            # If the card is the first one in the suit, it will modify game.led_suit
-            if len(self.trick) == 1:
-                self.led_suit = card.suit
+            if len(self.trick) > 0:
+                self.check_if_can_follow_suit(hand_index, player)
+            if player.can_follow_suit == True and not player.hand[hand_index].suit == self.led_suit:
+                print("you can't play that")
+            else:
+                self.card_played = True
+                card = player.hand.pop(hand_index)
+                self.trick[player] = card
+                
+                # If the card is the first one in the suit, it will modify game.led_suit
+                if len(self.trick) == 1:
+                    self.led_suit = card.suit
 
-            # If each player has played a card, resolve the trick
-            # Gives a printout for the terminal
-            if len(self.trick) == len(self.players):
-                for key, value in self.trick.items():
-                    print(f"{key.name.title()} played the {value.value} of {value.suit}")
-                winner = undtr.determine_winning_card(self.trick, self.led_suit, self.trump)
-                winner.tricks += 1
-                print(f"{winner.name.title()} won the trick and now has {winner.tricks} trick(s)")
-                self.winner_message = f"{winner.name.title()} won the trick!"
-                self.winner_index = self.players.index(winner)
-                self.tricks_played += 1
+                # If each player has played a card, resolve the trick
+                # Gives a printout for the terminal
+                if len(self.trick) == len(self.players):
+                    for key, value in self.trick.items():
+                        print(f"{key.name.title()} played the {value.value} of {value.suit}")
+                    winner = undtr.determine_winning_card(self.trick, self.led_suit, self.trump)
+                    winner.tricks += 1
+                    print(f"{winner.name.title()} won the trick and now has {winner.tricks} trick(s)")
+                    self.winner_message = f"{winner.name.title()} won the trick!"
+                    self.winner_index = self.players.index(winner)
+                    self.tricks_played += 1
 
-                # Decides whether the state should be between tricks or between rounds
-                if self.tricks_played == self.max_hand_size:
-                    self.state = "between rounds"
-                else:
-                    self.state = "between tricks"
+                    # Decides whether the state should be between tricks or between rounds
+                    if self.tricks_played == self.max_hand_size:
+                        self.state = "between rounds"
+                    else:
+                        self.state = "between tricks"
 
     def between_tricks(self):
         # Pass priority to whoever won the trick
@@ -184,7 +193,7 @@ class Game:
             player.score += player.tricks
             print(f"{player.name.title()} had a bid of {player.bid}")
             print(f"{player.name.title()} won {player.tricks} tricks")
-            if int(player.bid) == int(player.tricks):
+            if str(player.bid) == str(player.tricks):
                 player.score += 10
                 print(f"{player.name.title()} made their bid!")
 

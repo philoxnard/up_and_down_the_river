@@ -26,7 +26,7 @@ class Player:
         self.bid_active = False
         self.sid = sid
         self.hand = []
-        self.bid = "None"
+        self.bid = ""
         self.score = 0
         self.tricks = 0
         self.name = name

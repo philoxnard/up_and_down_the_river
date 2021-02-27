@@ -5,6 +5,7 @@
     height: 200px;
     position: relative;
     display: inline-block;
+    background-color: white;
 }
 .red{
     color: red;
