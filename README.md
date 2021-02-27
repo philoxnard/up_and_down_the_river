@@ -1,3 +1,4 @@
+
 # up_and_down_the_river
 
 Up and Down the River is an online multiplayer web app modeled after the card game of the same name. The back-end is written in Python utilizing the Flask framework, and the front end combines HTML, CSS, and Javascript, as well as the Socket.IO library to allow for multiple players to join.
@@ -6,11 +7,11 @@ Up and Down the River is an online multiplayer web app modeled after the card ga
 
 Each round, the players will be given a hand of cards, as well as being shown that round's trump card. Before playing, each player will, in turn, make a bid on how many tricks they think they will win during the round. Playeres earn a point for each trick they win, plus an additional 10 points if they end the round with the same amount of tricks as they bid earlier.
 
-![alt text](images/bidding.png "What the player sees when they are asked to make their bid for the current round")
+![bidding](https://user-images.githubusercontent.com/68870846/109394305-521e4180-78f4-11eb-82d2-f5f7438697c6.png)
 
 Rounds play out with each player, in turn, playing a card. Players must follow suit with whoever played the first card in the trick if possible. When all players have played their card in the trick, the trick will be awarded to whoever played the highest card of the led suit. However, if a card in the trick is the same suit as the trump card, that card will take priority over the led suit. If there are multiple trump cards in the suit, the winning card is the highest trump.
 
-![alt text](images/trick.png "A completed trick, displaying everyone's bids as well as how many tricks each player has one in the current round")
+![trick](https://user-images.githubusercontent.com/68870846/109394321-6cf0b600-78f4-11eb-8da0-0dd4637cee0c.png)
 
 Successive rounds have different hand sizes. The first round has a hand size of one, the second round a hand size of two, following the same pattern up to seven. After the seventh round, though, the following round has a six card hand, followed by a five card hand, following that same pattern back down to one. After the second one-card hand has been played, the game is over and the player with the highest score wins.
 
