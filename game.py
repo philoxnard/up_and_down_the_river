@@ -180,7 +180,7 @@ class Game:
                 for player in self.players:
                     player.tricks = 0
                     player.bid_active = False
-                    player.bid = 0
+                    player.bid = ""
                 self.tricks_played = 0
                 self.bids_collected = 0
                 # This makes sure the following round starts with the next player in the circle
